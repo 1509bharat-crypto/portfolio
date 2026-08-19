@@ -1,0 +1,494 @@
+<title>Bharat Wireframes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --bg:#EDEFF2;
+    --card:#FFFFFF;
+    --ink:#20242B;
+    --muted:#6A7280;
+    --line:#CBD0D8;
+    --line-strong:#A6ADB8;
+    --ph:#F2F4F7;
+    --accent:#2F63D8;
+    --accent-soft:rgba(47,99,216,.09);
+    --shadow:0 10px 30px rgba(32,36,43,.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161A;
+      --card:#1C1F25;
+      --ink:#E7E9EE;
+      --muted:#959DA9;
+      --line:#363C46;
+      --line-strong:#4B525E;
+      --ph:#22262D;
+      --accent:#7DA1F0;
+      --accent-soft:rgba(125,161,240,.12);
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161A;
+    --card:#1C1F25;
+    --ink:#E7E9EE;
+    --muted:#959DA9;
+    --line:#363C46;
+    --line-strong:#4B525E;
+    --ph:#22262D;
+    --accent:#7DA1F0;
+    --accent-soft:rgba(125,161,240,.12);
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:15px;line-height:1.45;
+  }
+  button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;text-align:left}
+  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+
+  .app{max-width:1240px;margin:0 auto;padding:20px 22px 34px;display:flex;flex-direction:column;gap:14px}
+
+  .top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .top__kicker{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+  .top h1{font-size:20px;font-weight:700;letter-spacing:-.01em;margin-top:2px;text-wrap:balance}
+
+  .thesis{color:var(--muted);font-size:14.5px;max-width:70ch}
+  .thesis strong{color:var(--ink);font-weight:600}
+
+  .stage{
+    height:clamp(580px, 76vh, 900px);
+    border:1px solid var(--line);
+    border-radius:14px;
+    background-image:radial-gradient(var(--line) 1px, transparent 1px);
+    background-size:22px 22px;
+    position:relative;overflow:hidden;
+  }
+  .stage__hint{
+    position:absolute;top:10px;left:14px;z-index:5;
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;
+    color:var(--muted);text-transform:uppercase;
+  }
+  .dir{position:absolute;inset:0;padding:34px 26px 26px;display:flex;flex-direction:column;gap:12px}
+  .frame{
+    flex:1;min-width:0;
+    background:var(--card);
+    border:1px solid var(--line-strong);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+    position:relative;overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  .frame__body{position:relative;flex:1;display:flex;min-height:0}
+  .dock{
+    border:1px solid var(--line-strong);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:10px 16px;
+    display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+    background:var(--card);
+  }
+  .dock__home{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;letter-spacing:-.01em}
+  .dock__home .mono{font-size:11px;color:var(--accent)}
+  .dock__home:hover{color:var(--accent)}
+  .dock__meta{font-size:11.5px;color:var(--muted);display:flex;align-items:center}
+
+  /* ---------- wireframe primitives ---------- */
+  .lab{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .tag{
+    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.05em;
+    color:var(--accent);border:1px dashed var(--accent);border-radius:6px;
+    padding:2px 6px;background:var(--accent-soft);white-space:nowrap;
+  }
+  .bar{height:8px;border-radius:4px;background:var(--line)}
+  .bar--40{width:40%}.bar--60{width:60%}.bar--80{width:80%}.bar--90{width:90%}
+  .ph{
+    background:
+      linear-gradient(to top right, transparent calc(50% - .5px), var(--line) calc(50% - .5px), var(--line) calc(50% + .5px), transparent calc(50% + .5px)),
+      linear-gradient(to top left,  transparent calc(50% - .5px), var(--line) calc(50% - .5px), var(--line) calc(50% + .5px), transparent calc(50% + .5px)),
+      var(--ph);
+    border:1px solid var(--line);border-radius:10px;
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:11.5px;font-weight:500;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 9px;white-space:nowrap}
+  .dot{width:8px;height:8px;border-radius:50%;background:#3FA968;display:inline-block;margin-right:7px;flex:none}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap}
+  .wbtn{border:1px solid var(--line-strong);border-radius:9px;padding:7px 12px;font-size:12.5px;font-weight:600}
+  .meta{display:flex;gap:9px;flex-wrap:wrap;font-size:12px;color:var(--muted);align-items:center}
+  .cellhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .storyline{font-size:12.5px;color:var(--muted)}
+  .storyline b{color:var(--ink)}
+  .dblock{border:1px dashed var(--line-strong);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+  .dblock b{font-size:13.5px}
+  .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  /* ---------- bento grid ---------- */
+  .bento{
+    flex:1;display:grid;gap:10px;padding:14px;
+    grid-template-columns:1.05fr 1.05fr 1fr 1fr;
+    grid-template-rows:0.95fr 1.1fr 0.7fr;
+    grid-template-areas:
+      "id    id    id     now"
+      "lisa  lisa  robin  cs3"
+      "lisa  lisa  others lab";
+    min-height:0;
+  }
+  .cell{
+    border:1px solid var(--line);border-radius:14px;padding:13px 15px;
+    display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0;overflow:hidden;
+    transition:border-color .18s,background .18s;
+  }
+  .cell--click{cursor:pointer}
+  .cell--click:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .c-id{grid-area:id}
+  .c-lisa{grid-area:lisa}
+  .c-robin{grid-area:robin}
+  .c-cs3{grid-area:cs3}
+  .c-now{grid-area:now}
+  .c-others{grid-area:others}
+  .c-lab{grid-area:lab}
+  .cell--slim{padding:10px 13px;gap:5px}
+  .cell--slim .storyline{font-size:11.5px}
+  .cell--slim .wbtn{padding:4px 9px;font-size:11px}
+  .idstory{font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px;margin-top:auto}
+  .idstory b{color:var(--ink)}
+  .idstory .go{color:var(--accent);font-weight:600;white-space:nowrap}
+  /* type scale: name > flagship > case titles > body > labels */
+  .claim{font-size:clamp(18px,2vw,26px);font-weight:700;color:var(--ink);letter-spacing:-.02em;line-height:1.18;max-width:42ch}
+  .lisa-title{font-size:clamp(20px,2.3vw,28px);font-weight:700;letter-spacing:-.02em}
+  .cs-title{font-size:16.5px;font-weight:700;letter-spacing:-.01em}
+  .csnum{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--line-strong)}
+  .lisa-sub{font-size:13px;color:var(--muted);max-width:44ch}
+  .stats{display:flex;gap:14px;flex-wrap:wrap}
+  .stat b{font-size:15px;display:block}
+  .stat span{font-size:11px;color:var(--muted)}
+  .c-lisa .ph{flex:1;min-height:50px}
+  .caselist{display:flex;flex-direction:column;gap:7px}
+  .caselist li{list-style:none;display:flex;justify-content:space-between;gap:8px;font-size:12.5px;align-items:baseline}
+  .caselist b{font-weight:600}
+  .caselist .mono{font-size:10px;color:var(--muted)}
+
+  /* ---------- focus view: one case study per card + mini-map of all ---------- */
+  .focusview{
+    position:absolute;inset:0;z-index:6;background:var(--card);
+    display:grid;grid-template-columns:1fr 216px;
+    opacity:0;pointer-events:none;transition:opacity .28s;
+  }
+  .focusview.is-open{opacity:1;pointer-events:auto}
+  .focus__main{padding:22px 24px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+  .focus__main h3{font-size:23px;font-weight:700;letter-spacing:-.015em}
+  .map{border-left:1px solid var(--line);padding:14px 12px;display:flex;flex-direction:column;gap:6px;overflow:auto}
+  .map__lab{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:6px 2px 2px}
+  .mapitem{
+    border:1px solid var(--line);border-radius:10px;padding:8px 10px;
+    font-size:12px;font-weight:600;color:var(--muted);width:100%;
+    transition:border-color .15s,background .15s,color .15s;
+  }
+  .mapitem:hover{color:var(--ink);border-color:var(--line-strong)}
+  .mapitem[aria-selected="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+  .mapitem--back{border-style:dashed;color:var(--accent);border-color:var(--accent)}
+
+  /* ---------- lab view: full-card grid of experiment boxes ---------- */
+  .labview{
+    position:absolute;inset:0;z-index:7;background:var(--card);
+    display:flex;flex-direction:column;
+    opacity:0;pointer-events:none;transition:opacity .28s;
+  }
+  .labview.is-open{opacity:1;pointer-events:auto}
+  .labview__head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:20px 22px 12px}
+  .labview__head h3{font-size:23px;font-weight:700;letter-spacing:-.015em}
+  .labview__close{border:1px solid var(--line-strong);border-radius:9px;padding:6px 11px;font-size:12.5px;font-weight:600}
+  .labview__close:hover{background:var(--ph)}
+  .labgrid{
+    flex:1;min-height:0;overflow:auto;
+    display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:minmax(150px,1fr);
+    gap:10px;padding:0 22px 22px;
+  }
+  .labbox{
+    border:1px solid var(--line);border-radius:14px;padding:12px 14px;
+    display:flex;flex-direction:column;gap:8px;min-height:0;
+  }
+  .labbox .ph{flex:1;min-height:50px}
+  .labbox .storyline{display:block}
+  .labbox--slot{border-style:dashed}
+  .labbox--slot .lab{color:var(--line-strong)}
+  .labbox--x{cursor:pointer;transition:border-color .15s}
+  .labbox--x:hover{border-color:var(--accent)}
+  .labbox--x.is-open{grid-column:span 2;grid-row:span 2;border-color:var(--accent);background:var(--accent-soft)}
+  .labmore{display:none;flex-direction:column;gap:8px;border-top:1px dashed var(--line);padding-top:8px}
+  .labbox--x.is-open .labmore{display:flex}
+
+  /* ---------- spec strip ---------- */
+  .spec{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .spec__item{
+    border:1px solid var(--line);border-radius:12px;padding:11px 13px;
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;line-height:1.55;color:var(--muted);
+  }
+  .spec__item b{color:var(--accent);font-weight:500;display:block;letter-spacing:.08em;text-transform:uppercase;font-size:10px;margin-bottom:3px}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:920px){
+    .stage{height:auto;min-height:76vh}
+    .dir{position:relative;padding:30px 14px 14px}
+    .frame{min-height:600px}
+    .bento{grid-template-columns:1fr 1fr;grid-template-rows:none;grid-template-areas:none;grid-auto-rows:minmax(110px,auto)}
+    .bento .cell{grid-area:auto}
+    .c-id{grid-column:1/3}
+    .c-lisa{grid-column:1/3;min-height:230px}
+    .focusview{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+    .labgrid{grid-template-columns:1fr 1fr}
+    .map{border-left:none;border-bottom:1px solid var(--line);flex-direction:row;flex-wrap:wrap;align-items:center}
+    .map__lab{width:100%}
+    .mapitem{width:auto}
+    .spec{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;animation:none !important}
+  }
+</style>
+
+<div class="app">
+  <header class="top">
+    <div>
+      <div class="top__kicker">wireframes · bento · locked</div>
+      <h1>The bento card</h1>
+    </div>
+  </header>
+
+  <p class="thesis"><strong>Recruiter scan logic.</strong> The top bar owns your name, availability and contact on every page. Row one of the card leads with the <em>pitch</em> at display size plus <em>now</em>. The work band reads 01 → 02 → 03 → other case studies → lab in strict priority order. Typography carries the hierarchy: display size for the pitch, second size for the flagship, third for case titles, small caps plus mono numerals for wayfinding.</p>
+
+  <div class="stage">
+    <span class="stage__hint">viewport · one rounded card, inset from every edge</span>
+
+    <section class="dir">
+      <div class="dock">
+        <button class="dock__home" id="dock-home"><span class="mono">⌗</span>Bharat Bharat</button>
+        <span class="tag">persistent top bar · its own card, reachable from any page</span>
+        <div class="btnrow">
+          <span class="dock__meta"><span class="dot"></span>Open to senior IC roles</span>
+          <span class="wbtn">Email</span><span class="wbtn">LinkedIn</span><span class="wbtn">Resume</span>
+        </div>
+      </div>
+
+      <div class="frame">
+        <div class="frame__body">
+        <div class="bento">
+          <div class="cell c-id">
+            <div class="cellhead"><span class="lab">The pitch / story</span></div>
+            <p class="claim">I design conversations between people and machines.</p>
+            <div class="chips">
+              <span class="chip">Conversation design</span><span class="chip">Voice UX</span>
+              <span class="chip">AI-assisted build</span><span class="chip">Systems thinking</span>
+            </div>
+            <p class="idstory"><b>Engineer → industrial → ethnography → product.</b> One throughline: how people and things communicate. <span class="go">Read the story →</span></p>
+          </div>
+
+          <div class="cell cell--slim c-now">
+            <div class="cellhead"><span class="lab">Now</span></div>
+            <p class="storyline"><span class="dot"></span><b>Robin, Utrecht.</b> AI recruiting workflows. Open to senior IC roles.</p>
+          </div>
+
+
+          <button class="cell c-lisa cell--click" data-case="lisa">
+            <div class="cellhead"><span class="lab">Case study · flagship</span><span class="csnum">01</span></div>
+            <div class="lisa-title">Lisa → Mona</div>
+            <p class="lisa-sub">Voice AI that replaced employee surveys with real conversations. Designed and built end-to-end.</p>
+            <div class="stats">
+              <div class="stat"><b>120k+</b><span>conversations</span></div>
+              <div class="stat"><b>14</b><span>languages</span></div>
+              <div class="stat"><b>7+</b><span>clients</span></div>
+            </div>
+            <div class="ph"></div>
+            <div class="meta"><span>React</span><span>·</span><span>Postgres</span><span>·</span><span>ElevenLabs</span><span>·</span><span>OpenAI</span><span>·</span><span>Claude Code</span><span class="tag">click → opens with map of all case studies</span></div>
+          </button>
+
+          <button class="cell cell--click c-robin" data-case="robin">
+            <div class="cellhead"><span class="lab">Case study</span><span class="csnum">02</span></div>
+            <div class="cs-title">Robin</div>
+            <p class="storyline">Recruiting workflows, redesigned around AI.</p>
+            <div class="bar bar--80"></div><div class="bar bar--40"></div>
+          </button>
+
+          <button class="cell cell--click c-cs3" data-case="cs3">
+            <div class="cellhead"><span class="lab">Case study · slot</span><span class="csnum">03</span></div>
+            <div class="cs-title">Next shipped story</div>
+            <div class="bar bar--80"></div><div class="bar bar--40"></div>
+          </button>
+
+          <button class="cell cell--click cell--slim c-others" data-case="others">
+            <div class="cellhead"><span class="lab">Other case studies</span><span class="csnum">04+</span></div>
+            <p class="storyline"><b>Case study 04</b> · <b>Case study 05</b> →</p>
+          </button>
+
+          <button class="cell cell--click cell--slim c-lab" data-case="lab">
+            <div class="cellhead"><span class="lab">Lab</span></div>
+            <p class="storyline"><b>De Wacht</b> · <b>Talking Objects</b> · <b>Token Sculpture</b></p>
+          </button>
+
+        </div>
+
+        <div class="focusview" id="focusview">
+          <div class="focus__main">
+            <span class="lab" id="f-lab"></span>
+            <h3 id="f-title"></h3>
+            <p class="lisa-sub" id="f-sub"></p>
+            <div class="dgrid" id="f-blocks"></div>
+            <div class="ph" style="min-height:110px;flex:1"></div>
+          </div>
+          <aside class="map" aria-label="All case studies">
+            <button class="mapitem mapitem--back" id="f-close">⌗ Back to grid</button>
+            <div class="map__lab">Case studies</div>
+            <button class="mapitem" data-fcase="lisa">01 · Lisa → Mona</button>
+            <button class="mapitem" data-fcase="robin">02 · Robin</button>
+            <button class="mapitem" data-fcase="cs3">03 · slot</button>
+            <div class="map__lab">Other case studies</div>
+            <button class="mapitem" data-fcase="cs4">04 · slot</button>
+            <button class="mapitem" data-fcase="cs5">05 · slot</button>
+            <div class="map__lab">Elsewhere</div>
+            <button class="mapitem" data-fcase="lab">Lab</button>
+          </aside>
+        </div>
+
+        <div class="labview" id="labview">
+          <div class="labview__head">
+            <div>
+              <span class="lab">Lab · open questions</span>
+              <h3>Experiments</h3>
+            </div>
+            <button class="labview__close" id="lab-close">⌗ Back to grid</button>
+          </div>
+          <div class="labgrid">
+            <button class="labbox labbox--x">
+              <span class="cellhead"><span class="lab">Voice</span><span class="tag">click to expand in place</span></span>
+              <span class="ph"></span>
+              <span class="storyline"><b>De Wacht.</b> Voice agent for Dutch tradespeople. Parked, documented.</span>
+              <span class="labmore">
+                <span class="storyline">Status: parked · fully documented · one working prototype call flow</span>
+                <span class="bar bar--90"></span><span class="bar bar--60"></span>
+                <span class="storyline"><b>Read the log →</b></span>
+              </span>
+            </button>
+            <button class="labbox labbox--x">
+              <span class="cellhead"><span class="lab">Character</span></span>
+              <span class="ph"></span>
+              <span class="storyline"><b>Talking Objects.</b> What makes a character feel alive?</span>
+              <span class="labmore">
+                <span class="storyline">Status: active · vision AI gives objects a voice · the open question is return visits</span>
+                <span class="bar bar--90"></span><span class="bar bar--60"></span>
+                <span class="storyline"><b>Read the log →</b></span>
+              </span>
+            </button>
+            <button class="labbox labbox--x">
+              <span class="cellhead"><span class="lab">Hardware</span></span>
+              <span class="ph"></span>
+              <span class="storyline"><b>Token Sculpture.</b> Kinetic AI usage visualization on Arduino/ESP32.</span>
+              <span class="labmore">
+                <span class="storyline">Status: building · tokens per second become physical motion</span>
+                <span class="bar bar--90"></span><span class="bar bar--60"></span>
+                <span class="storyline"><b>Read the log →</b></span>
+              </span>
+            </button>
+            <div class="labbox labbox--slot">
+              <span class="lab">Slot</span>
+              <div class="ph"></div>
+              <p class="storyline">Next experiment. One box per idea.</p>
+            </div>
+            <div class="labbox labbox--slot">
+              <span class="lab">Slot</span>
+              <div class="ph"></div>
+              <p class="storyline">The grid just grows.</p>
+            </div>
+            <div class="labbox labbox--slot">
+              <span class="lab">Slot</span>
+              <div class="ph"></div>
+              <p class="storyline">No hierarchy here, all play.</p>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="spec">
+    <div class="spec__item"><b>Interaction</b>Case studies open one-per-view with a mini-map of all of them; the Lab is a full-card grid where each box expands in place when clicked. The floating dock (home · availability · contact) is reachable from every page; ⌗ or Esc returns to the grid.</div>
+    <div class="spec__item"><b>More case studies</b>Top three earn bento tiles (flagship gets the big one); everything else is a row in "other case studies". Promoting a story = moving its entry up. The card stays one glance at any count.</div>
+    <div class="spec__item"><b>Maintain</b>Each module is one component fed by one data entry. Adding a case study = adding an entry; the grid and detail views render themselves.</div>
+  </footer>
+</div>
+
+<script>
+  const CASES = {
+    lisa: {
+      lab: 'Case study · flagship · 2023–2025',
+      title: 'Lisa → Mona',
+      sub: 'Voice AI replacing employee surveys with natural conversations. 120k+ conversations · 14 languages · 7+ clients. Designed and built end-to-end.',
+      blocks: ['Why voice, not chat', 'Questions people answer honestly', 'Trust & anonymity at enterprise scale', 'The build: Claude Code + CLAUDE.md']
+    },
+    robin: {
+      lab: 'Case study · current · Robin, Utrecht',
+      title: 'Robin',
+      sub: 'Recruitment platform for blue-collar workers. Seamless AI workflows for faster recruiting.',
+      blocks: ['The workflow, before / after', 'One decision, told properly']
+    },
+    cs3: {
+      lab: 'Case study 03 · slot',
+      title: 'Next shipped story',
+      sub: 'Reserved top-three slot. One data entry fills this tile and this detail view.',
+      blocks: ['Decision block', 'Decision block']
+    },
+    cs4: {
+      lab: 'Case study 04 · slot',
+      title: 'Case study 04',
+      sub: 'Lives in the other case studies tile on the grid, and still gets the same full card and map row here.',
+      blocks: ['Decision block', 'Decision block']
+    },
+    cs5: {
+      lab: 'Case study 05 · slot',
+      title: 'Case study 05',
+      sub: 'Same template, one more data entry. The map column simply grows by a row.',
+      blocks: ['Decision block', 'Decision block']
+    },
+  };
+  const focusview = document.getElementById('focusview');
+  const labview = document.getElementById('labview');
+  const mapitems = [...document.querySelectorAll('[data-fcase]')];
+
+  function openCase(key){
+    if(key === 'lab'){
+      focusview.classList.remove('is-open');
+      labview.classList.add('is-open');
+      return;
+    }
+    labview.classList.remove('is-open');
+    const d = CASES[key];
+    document.getElementById('f-lab').textContent = d.lab;
+    document.getElementById('f-title').textContent = d.title;
+    document.getElementById('f-sub').textContent = d.sub;
+    document.getElementById('f-blocks').innerHTML = d.blocks.map(b =>
+      '<div class="dblock"><b>' + b + '</b><div class="bar bar--90"></div><div class="bar bar--60"></div></div>').join('');
+    mapitems.forEach(m => m.setAttribute('aria-selected', String(m.dataset.fcase === key)));
+    focusview.classList.add('is-open');
+  }
+  document.querySelectorAll('[data-case]').forEach(btn => {
+    btn.addEventListener('click', () => openCase(btn.dataset.case === 'others' ? 'cs4' : btn.dataset.case));
+  });
+  mapitems.forEach(m => m.addEventListener('click', () => openCase(m.dataset.fcase)));
+  document.getElementById('f-close').addEventListener('click', () => focusview.classList.remove('is-open'));
+  document.getElementById('lab-close').addEventListener('click', () => labview.classList.remove('is-open'));
+  document.getElementById('dock-home').addEventListener('click', () => {
+    focusview.classList.remove('is-open');
+    labview.classList.remove('is-open');
+  });
+  document.querySelectorAll('.labbox--x').forEach(b => {
+    b.addEventListener('click', () => b.classList.toggle('is-open'));
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){ focusview.classList.remove('is-open'); labview.classList.remove('is-open'); }
+  });
+</script>
