@@ -1,0 +1,888 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------ *
+ * Tokens. Ported from wireframes/bento-wireframe.html — the wireframe
+ * stays the source of truth for the skeleton; this is the same palette
+ * expressed as theme variables so Tailwind utilities can reach them.
+ * ------------------------------------------------------------------ */
+:root {
+  /* A technical drawing reads in neutrals: the ramp steps evenly and the only
+     hue in the system is the blueprint accent, spent sparingly. */
+  --bg: #e8eaee;
+  --card: #ffffff;
+  --ink: #13161b;
+  --muted: #5b626d;
+  --line: #d6dae1;
+  --line-strong: #99a1ad;
+  /* Numerals are quiet by size and by being mono, not by low contrast:
+     --line-strong is a border value and fails AA as text (2.6:1). */
+  --numeral: #6b7280;
+  --ph: #f4f6f9;
+  --accent: #1f55d6;
+  --accent-soft: rgba(31, 85, 214, 0.06);
+  --accent-line: rgba(31, 85, 214, 0.5);
+  --live: #2f8f5b;
+  /* Two-part shadow: a contact edge plus a soft cast, so the card sits on the
+     ground instead of floating over it. */
+  --shadow: 0 1px 2px rgba(19, 22, 27, 0.05), 0 14px 34px rgba(19, 22, 27, 0.07);
+
+  /* Type scale. Every size in the system comes from here. */
+  --t-label: 10px;
+  --t-track: 0.14em;
+  --t-xs: 11.5px;
+  --t-sm: 12.5px;
+  --t-md: 13.5px;
+  --t-body: 15px;
+  --t-lg: 17px;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 15px;
+  --r-xl: 22px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0e1013;
+    --card: #16191d;
+    --ink: #e8ebf0;
+    --muted: #929aa5;
+    --line: #282d34;
+    --line-strong: #464d58;
+    --numeral: #838a97;
+    --ph: #1b1f24;
+    --accent: #7ea2f7;
+    --accent-soft: rgba(126, 162, 247, 0.09);
+    --accent-line: rgba(126, 162, 247, 0.55);
+    --live: #4bbd80;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 14px 34px rgba(0, 0, 0, 0.35);
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0e1013;
+  --card: #16191d;
+  --ink: #e8ebf0;
+  --muted: #929aa5;
+  --line: #282d34;
+  --line-strong: #464d58;
+  --numeral: #838a97;
+  --ph: #1b1f24;
+  --accent: #7ea2f7;
+  --accent-soft: rgba(126, 162, 247, 0.09);
+  --accent-line: rgba(126, 162, 247, 0.55);
+  --live: #4bbd80;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 14px 34px rgba(0, 0, 0, 0.35);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-archivo);
+  --font-mono: var(--font-plex-mono);
+}
+
+/* ------------------------------------------------------------------ *
+ * Base
+ * ------------------------------------------------------------------ */
+html {
+  /* Prevents iOS Safari from inflating type in landscape. */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-archivo), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: var(--t-body);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Numerals line up in columns across stats, numbers and metadata. */
+  font-variant-numeric: tabular-nums;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+
+.mono {
+  font-family: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ------------------------------------------------------------------ *
+ * Shell. The card fills the viewport on desktop and falls back to
+ * natural height (page scrolls) once the bento has to stack.
+ * ------------------------------------------------------------------ */
+.shell {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 14px 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100svh;
+}
+
+.frame {
+  flex: 1;
+  min-height: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.frame__body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* ---------- top bar ---------- */
+.dock {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: var(--card);
+}
+
+.dock__home {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--t-md);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  transition: color 0.16s;
+}
+
+.dock__home .mono {
+  font-size: 11px;
+  color: var(--accent);
+}
+
+.dock__home:hover {
+  color: var(--accent);
+}
+
+.dock__meta {
+  font-size: var(--t-xs);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+}
+
+.dock__links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ---------- wireframe primitives ---------- */
+.lab {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--t-label);
+  letter-spacing: var(--t-track);
+  text-transform: uppercase;
+  color: var(--muted);
+  /* Uppercase mono at 10px sits optically low against a cap-height neighbour. */
+  line-height: 1.6;
+}
+
+.bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--line);
+}
+
+/* Placeholder box: the crossed rectangle that stands in for imagery. */
+.ph {
+  background:
+    linear-gradient(
+      to top right,
+      transparent calc(50% - 0.5px),
+      var(--line) calc(50% - 0.5px),
+      var(--line) calc(50% + 0.5px),
+      transparent calc(50% + 0.5px)
+    ),
+    linear-gradient(
+      to top left,
+      transparent calc(50% - 0.5px),
+      var(--line) calc(50% - 0.5px),
+      var(--line) calc(50% + 0.5px),
+      transparent calc(50% + 0.5px)
+    ),
+    var(--ph);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  /* The cross is scaffolding, not content — keep it below the type. */
+  opacity: 0.7;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  font-size: var(--t-xs);
+  font-weight: 500;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3.5px 10px;
+  white-space: nowrap;
+  transition: border-color 0.16s, color 0.16s;
+}
+
+.chips:hover .chip {
+  border-color: var(--line-strong);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--live);
+  display: inline-block;
+  margin-right: 8px;
+  flex: none;
+  /* "Available" is the one genuinely live fact on the page; it breathes. */
+  animation: live 3s ease-out infinite;
+}
+
+@keyframes live {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--live) 45%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+.wbtn {
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 7px 12px;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  transition: border-color 0.16s, background 0.16s, color 0.16s;
+}
+
+.wbtn:hover {
+  border-color: var(--accent-line);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.meta {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  font-size: var(--t-sm);
+  color: var(--muted);
+  align-items: center;
+}
+
+.cellhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.storyline {
+  font-size: var(--t-sm);
+  color: var(--muted);
+}
+
+.storyline b {
+  color: var(--ink);
+}
+
+.dblock {
+  border: 1px dashed var(--line);
+  border-radius: var(--r-md);
+  padding: 13px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  transition: border-color 0.18s;
+}
+
+.dblock:hover {
+  border-color: var(--line-strong);
+}
+
+.dblock b {
+  font-size: var(--t-md);
+  font-weight: 600;
+  letter-spacing: -0.008em;
+}
+
+.dgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Bento grid.
+ * Desktop: the locked 4-column layout, card fills the viewport.
+ * ------------------------------------------------------------------ */
+.bento {
+  flex: 1;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  grid-template-columns: 1.05fr 1.05fr 1fr 1fr;
+  grid-template-rows: 0.95fr 1.1fr 0.7fr;
+  grid-template-areas:
+    'id    id    id     now'
+    'lisa  lisa  robin  cs3'
+    'lisa  lisa  others lab';
+  min-height: 0;
+}
+
+.cell {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.cell--click {
+  cursor: pointer;
+}
+
+/* A clickable tile lifts by exactly one pixel — enough to register as a
+   surface, not enough to disturb the grid's alignment. */
+.cell--click:hover {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.cell--click:active {
+  transform: translateY(0);
+}
+
+.c-id { grid-area: id; }
+.c-lisa { grid-area: lisa; }
+.c-robin { grid-area: robin; }
+.c-cs3 { grid-area: cs3; }
+.c-now { grid-area: now; }
+.c-others { grid-area: others; }
+.c-lab { grid-area: lab; }
+
+.cell--slim {
+  padding: 10px 13px;
+  gap: 5px;
+}
+
+.cell--slim .storyline { font-size: 11.5px; }
+.cell--slim .wbtn { padding: 4px 9px; font-size: 11px; }
+
+/* Vertical rhythm inside tiles.
+   The bento rows are tall and most tiles hold little content, which left
+   everything stacked at the top over dead space. Labels stay pinned to the
+   top edge; short copy settles into the middle; placeholder bars drop to the
+   baseline so a tile reads as a framed composition rather than a top-aligned
+   fragment. Only applies where the grid actually gives a tile spare height. */
+@media (min-width: 760px) {
+  .c-now .storyline,
+  .c-others .storyline,
+  .c-lab .storyline {
+    margin-block: auto;
+  }
+
+  .c-robin > *:last-child,
+  .c-cs3 > *:last-child {
+    margin-top: auto;
+  }
+}
+
+.idstory {
+  font-size: var(--t-sm);
+  color: var(--muted);
+  border-top: 1px dashed var(--line);
+  padding-top: 8px;
+  margin-top: auto;
+}
+
+.idstory b { color: var(--ink); }
+
+.idstory .go {
+  color: var(--accent);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  padding: 0;
+}
+
+.idstory .go:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Type scale: name > flagship > case titles > body > labels. */
+.claim {
+  font-size: clamp(20px, 2.2vw, 29px);
+  font-weight: 600;
+  color: var(--ink);
+  /* Tracking tightens as the size grows; 700 at display size reads as shouting. */
+  letter-spacing: -0.028em;
+  line-height: 1.14;
+  max-width: 24ch;
+  text-wrap: balance;
+  margin-block: 2px 4px;
+}
+
+.lisa-title {
+  font-size: clamp(21px, 2.3vw, 28px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.cs-title {
+  font-size: var(--t-lg);
+  font-weight: 600;
+  letter-spacing: -0.017em;
+  line-height: 1.2;
+}
+
+.csnum {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--t-md);
+  font-weight: 400;
+  color: var(--numeral);
+  letter-spacing: 0.02em;
+}
+
+.lisa-sub {
+  font-size: var(--t-md);
+  color: var(--muted);
+  max-width: 44ch;
+}
+
+.stats {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.stat b {
+  font-size: var(--t-lg);
+  font-weight: 600;
+  display: block;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.stat span {
+  font-size: var(--t-label);
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.c-lisa .ph { flex: 1; min-height: 50px; }
+
+.caselist {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.caselist li {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+  align-items: baseline;
+}
+
+/* ------------------------------------------------------------------ *
+ * Focus view: one case study per card, with a map of all of them.
+ * ------------------------------------------------------------------ */
+.focusview {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  background: var(--card);
+  display: grid;
+  grid-template-columns: 1fr 216px;
+  min-height: 0;
+}
+
+.focus__main {
+  padding: 22px 24px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+
+.focus__main h1 {
+  font-size: clamp(22px, 2.4vw, 29px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.14;
+}
+
+.map {
+  border-left: 1px solid var(--line);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: auto;
+  min-height: 0;
+}
+
+.map__lab {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--t-label);
+  letter-spacing: var(--t-track);
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 6px 2px 2px;
+}
+
+.mapitem {
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 8px 11px;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--muted);
+  width: 100%;
+  display: block;
+  transition: border-color 0.16s, background 0.16s, color 0.16s;
+}
+
+.mapitem:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.mapitem[aria-current='true'] {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.mapitem--back {
+  border-style: dashed;
+  color: var(--accent);
+  border-color: var(--accent-line);
+  margin-bottom: 4px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Lab view: full-card grid of experiment boxes.
+ * ------------------------------------------------------------------ */
+.labview {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  background: var(--card);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.labview__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 22px 12px;
+}
+
+.labview__head h1 {
+  font-size: clamp(22px, 2.4vw, 29px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.14;
+}
+
+.labgrid {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: minmax(150px, 1fr);
+  gap: 10px;
+  padding: 0 22px 22px;
+}
+
+.labbox {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 13px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.labbox .ph { flex: 1; min-height: 50px; }
+.labbox .storyline { display: block; }
+
+.labbox--slot { border-style: dashed; }
+.labbox--slot .lab { color: var(--numeral); }
+
+.labbox--x {
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.labbox--x:hover { border-color: var(--accent-line); }
+
+/* The toggle fills the box's resting area so the whole card reads as the
+   target, while the expanded panel's link stays outside the button. */
+.labbox__toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  cursor: pointer;
+}
+
+.labbox--x[data-expanded='true'] {
+  grid-column: span 2;
+  grid-row: span 2;
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+
+.labmore__link {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--accent);
+  align-self: flex-start;
+}
+
+.labmore__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.labmore {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px dashed var(--line);
+  padding-top: 8px;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ *
+ * Spec strip
+ * ------------------------------------------------------------------ */
+.spec {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.spec__item {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--t-xs);
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.spec__item b {
+  color: var(--accent);
+  font-weight: 500;
+  display: block;
+  letter-spacing: var(--t-track);
+  text-transform: uppercase;
+  font-size: var(--t-label);
+  margin-bottom: 5px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Responsive.
+ *
+ * >=1100px  the locked 4-column bento, card fills the viewport
+ * 760–1099  two columns, card grows to fit, page scrolls
+ * <760      single column stack in priority order
+ * ------------------------------------------------------------------ */
+@media (max-width: 1099px) {
+  .shell {
+    min-height: 0;
+    padding: 12px 12px 18px;
+  }
+
+  /* Stop pinning the card to the viewport: let content set the height. */
+  .frame {
+    flex: none;
+  }
+
+  .bento {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: none;
+    grid-auto-rows: minmax(112px, auto);
+    grid-template-areas:
+      'id     id'
+      'now    now'
+      'lisa   lisa'
+      'robin  cs3'
+      'others lab';
+  }
+
+  .c-lisa { min-height: 260px; }
+
+  /* Overlays can no longer be absolutely pinned to a fixed-height card,
+     so they take over the screen instead. */
+  .focusview,
+  .labview {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    border-radius: 0;
+    overflow: auto;
+  }
+
+  .focusview {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .map {
+    border-left: none;
+    border-bottom: 1px solid var(--line);
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    overflow: visible;
+  }
+
+  .map__lab { width: 100%; }
+  .mapitem { width: auto; }
+
+  .labgrid { grid-template-columns: 1fr 1fr; }
+  .spec { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 759px) {
+  .shell {
+    padding: 10px 10px 16px;
+    gap: 10px;
+  }
+
+  .frame { border-radius: 18px; }
+
+  .bento {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'id'
+      'now'
+      'lisa'
+      'robin'
+      'cs3'
+      'others'
+      'lab';
+    padding: 10px;
+  }
+
+  .dock {
+    /* Name and availability read first; the links wrap under them. */
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .dock__links { width: 100%; }
+
+  .wbtn { flex: 1; text-align: center; }
+
+  .focus__main { padding: 18px 16px 28px; }
+  .labview__head { padding: 16px 16px 10px; }
+  .labgrid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+    padding: 0 16px 20px;
+  }
+
+  /* Expanding in place has no meaning in a single column. */
+  .labbox--x[data-expanded='true'] {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+
+  .dgrid { grid-template-columns: 1fr; }
+}
+
+/* Coarse pointers get no hover paint — it sticks after tap. */
+@media (hover: none) {
+  .cell--click:hover {
+    border-color: var(--line);
+    background: transparent;
+  }
+  .wbtn:hover {
+    border-color: var(--line-strong);
+    color: inherit;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

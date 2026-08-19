@@ -15,7 +15,13 @@ A single bento card, everything scannable at a glance, minimal scrolling.
 ## Progress
 
 - `wireframes/bento-wireframe.html`: the locked interactive wireframe. Open it in a browser and click around.
-- Next: visual design pass (typography, color, motion) on top of the locked skeleton.
+- The site is built: Next.js 16 (App Router), TypeScript, Tailwind v4, Motion. Run `npm run dev`.
+  - `/` is the bento card. Case studies and the lab open as overlays, so the URL updates without a navigation.
+  - `/work/[slug]` and `/lab` are real prerendered pages for direct links, sharing and SEO.
+  - Responsive: four-column bento above 1100px, two columns to 760px, a single stack below that.
+- Visual design pass done, staying inside the wireframe language: neutral ramp with a single blueprint accent, one type scale (mono labels, tabular numerals, tightening display tracking), and a shared motion vocabulary — tiles stagger in, bars draw from the left, the lab reflows around an expanded box, the availability dot breathes. All text clears WCAG AA in both themes.
+- Every route is built: `/` (the bento card), `/story`, `/work/[slug]`, `/lab`, `/lab/[slug]`, a styled 404, plus generated OG images, sitemap and robots. 22 prerendered routes.
+- Next: real case study writing, and imagery to replace the placeholders.
 
 ## Reference projects
 
