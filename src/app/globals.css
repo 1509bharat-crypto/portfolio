@@ -162,14 +162,16 @@ a {
 .frame {
   flex: 1;
   min-height: 0;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-xl);
-  box-shadow: var(--shadow);
   position: relative;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* Transparent: the container that held the tiles is gone. The grid itself
+     is the composition now, and each tile is its own surface on the ground.
+     Kept as an element because the overlays position against it. */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
 }
 
 .frame__body {
@@ -399,7 +401,7 @@ a {
   flex: 1;
   display: grid;
   gap: clamp(10px, 0.75vw, 16px);
-  padding: clamp(10px, 0.85vw, 18px);
+  padding: 0;
   grid-template-columns: 1.05fr 1.05fr 1fr 1fr;
   /* minmax(0, …) rather than a bare fr: an fr track's implicit minimum is
      auto, so a tall tile can push the grid past the card's height and make
@@ -413,6 +415,7 @@ a {
 }
 
 .cell {
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   padding: clamp(13px, 1vw, 18px) clamp(15px, 1.15vw, 21px);
@@ -433,7 +436,7 @@ a {
    surface, not enough to disturb the grid's alignment. */
 .cell--click:hover {
   border-color: var(--accent-line);
-  background: var(--accent-soft);
+  background: color-mix(in srgb, var(--accent) 5%, var(--card));
   transform: translateY(-1px);
 }
 
@@ -591,6 +594,10 @@ a {
   inset: 0;
   z-index: 6;
   background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow);
+  overflow: hidden;
   display: grid;
   grid-template-columns: 1fr 216px;
   min-height: 0;
@@ -670,6 +677,10 @@ a {
   inset: 0;
   z-index: 7;
   background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -803,7 +814,9 @@ a {
     position: fixed;
     inset: 0;
     z-index: 60;
+    border: none;
     border-radius: 0;
+    box-shadow: none;
     overflow: auto;
   }
 
@@ -842,7 +855,6 @@ a {
       'cs3'
       'others'
       'lab';
-    padding: 10px;
   }
 
   .focus__main { padding: 18px 16px 28px; }
