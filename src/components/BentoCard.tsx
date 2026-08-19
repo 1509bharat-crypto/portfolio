@@ -192,37 +192,6 @@ export function BentoCard({ initialView }: { initialView?: View }) {
           </AnimatePresence>
         </div>
       </div>
-
-      <SpecStrip />
     </div>
-  );
-}
-
-/** The notes that keep the concept legible while it's still a skeleton. */
-function SpecStrip() {
-  const items = [
-    {
-      title: 'Interaction',
-      body: 'Case studies open one-per-view with a mini-map of all of them; the Lab is a full-card grid where each box expands in place. The top bar is reachable from every page; ⌗ or Esc returns to the grid.',
-    },
-    {
-      title: 'More case studies',
-      body: 'Top three earn bento tiles (flagship gets the big one); everything else is a row in "other case studies". Promoting a story means moving its entry up.',
-    },
-    {
-      title: 'Maintain',
-      body: 'Each module is one component fed by one data entry. Adding a case study means adding an entry to src/data/cases.ts; the grid and detail views render themselves.',
-    },
-  ];
-
-  return (
-    <footer className="spec">
-      {items.map((i) => (
-        <div className="spec__item" key={i.title}>
-          <b>{i.title}</b>
-          {i.body}
-        </div>
-      ))}
-    </footer>
   );
 }

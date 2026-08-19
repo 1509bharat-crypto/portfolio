@@ -26,14 +26,21 @@
      ground instead of floating over it. */
   --shadow: 0 1px 2px rgba(19, 22, 27, 0.05), 0 14px 34px rgba(19, 22, 27, 0.07);
 
-  /* Type scale. Every size in the system comes from here. */
-  --t-label: 10px;
+  /* Type scale. Every size in the system comes from here, and --t-scale is
+     the single knob that steps the whole thing up on large displays. */
+  --t-scale: 1;
+  --t-label: calc(10px * var(--t-scale));
   --t-track: 0.14em;
-  --t-xs: 11.5px;
-  --t-sm: 12.5px;
-  --t-md: 13.5px;
-  --t-body: 15px;
-  --t-lg: 17px;
+  --t-xs: calc(11.5px * var(--t-scale));
+  --t-sm: calc(12.5px * var(--t-scale));
+  --t-md: calc(13.5px * var(--t-scale));
+  --t-body: calc(15px * var(--t-scale));
+  --t-lg: calc(17px * var(--t-scale));
+
+  /* Card width and the rhythm around it grow with the same steps. */
+  --shell-max: 1240px;
+  --shell-pad: 14px;
+  --shell-gap: 12px;
 
   --r-sm: 8px;
   --r-md: 12px;
@@ -136,12 +143,12 @@ a {
  * natural height (page scrolls) once the bento has to stack.
  * ------------------------------------------------------------------ */
 .shell {
-  max-width: 1240px;
+  max-width: var(--shell-max);
   margin: 0 auto;
-  padding: 14px 14px 20px;
+  padding: var(--shell-pad) var(--shell-pad) calc(var(--shell-pad) + 6px);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--shell-gap);
   min-height: 100svh;
 }
 
@@ -442,6 +449,13 @@ a {
   .c-cs3 > *:last-child {
     margin-top: auto;
   }
+
+  /* Two auto margins in one column split the slack evenly, so the pitch and
+     its disciplines float in the middle of the tile with the label pinned
+     top and the throughline pinned to the rule at the bottom. */
+  .c-id .claim {
+    margin-top: auto;
+  }
 }
 
 .idstory {
@@ -469,7 +483,7 @@ a {
 
 /* Type scale: name > flagship > case titles > body > labels. */
 .claim {
-  font-size: clamp(20px, 2.2vw, 29px);
+  font-size: clamp(20px, 2.2vw, calc(29px * var(--t-scale)));
   font-weight: 600;
   color: var(--ink);
   /* Tracking tightens as the size grows; 700 at display size reads as shouting. */
@@ -481,7 +495,7 @@ a {
 }
 
 .lisa-title {
-  font-size: clamp(21px, 2.3vw, 28px);
+  font-size: clamp(21px, 2.3vw, calc(28px * var(--t-scale)));
   font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.15;
@@ -568,7 +582,7 @@ a {
 }
 
 .focus__main h1 {
-  font-size: clamp(22px, 2.4vw, 29px);
+  font-size: clamp(22px, 2.4vw, calc(29px * var(--t-scale)));
   font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.14;
@@ -646,7 +660,7 @@ a {
 }
 
 .labview__head h1 {
-  font-size: clamp(22px, 2.4vw, 29px);
+  font-size: clamp(22px, 2.4vw, calc(29px * var(--t-scale)));
   font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.14;
@@ -725,35 +739,6 @@ a {
 }
 
 /* ------------------------------------------------------------------ *
- * Spec strip
- * ------------------------------------------------------------------ */
-.spec {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.spec__item {
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  padding: 12px 14px;
-  font-family: var(--font-plex-mono), monospace;
-  font-size: var(--t-xs);
-  line-height: 1.6;
-  color: var(--muted);
-}
-
-.spec__item b {
-  color: var(--accent);
-  font-weight: 500;
-  display: block;
-  letter-spacing: var(--t-track);
-  text-transform: uppercase;
-  font-size: var(--t-label);
-  margin-bottom: 5px;
-}
-
-/* ------------------------------------------------------------------ *
  * Responsive.
  *
  * >=1100px  the locked 4-column bento, card fills the viewport
@@ -814,7 +799,6 @@ a {
   .mapitem { width: auto; }
 
   .labgrid { grid-template-columns: 1fr 1fr; }
-  .spec { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 759px) {
@@ -864,6 +848,65 @@ a {
   }
 
   .dgrid { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------------ *
+ * Large displays.
+ *
+ * The concept is one card filling the viewport, so on a big screen the card
+ * has to grow — capped at 1240px it floats in a field of grey. Everything
+ * steps together off --t-scale, so proportions hold rather than the card
+ * getting wider around type that stayed small. Line length is still governed
+ * by the ch-based max-widths on .claim and .lisa-sub, so nothing runs long.
+ * ------------------------------------------------------------------ */
+@media (min-width: 1440px) {
+  :root {
+    --t-scale: 1.06;
+    --shell-max: 1400px;
+    --shell-pad: 18px;
+    --shell-gap: 14px;
+  }
+
+  .bento { gap: 12px; padding: 14px; }
+  .cell { padding: 16px 18px; }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --t-scale: 1.15;
+    --shell-max: 1660px;
+    --shell-pad: 24px;
+    --shell-gap: 16px;
+  }
+
+  .bento { gap: 14px; padding: 16px; }
+  .cell { padding: 18px 20px; }
+  .focusview { grid-template-columns: 1fr 260px; }
+  .focus__main { padding: 30px 34px; }
+  /* Three columns of experiment box get uncomfortably wide past this point. */
+  .labgrid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --t-scale: 1.26;
+    --shell-max: 2000px;
+    --shell-pad: 30px;
+  }
+
+  .bento { gap: 16px; padding: 18px; }
+  .focusview { grid-template-columns: 1fr 300px; }
+  .labgrid { grid-template-columns: repeat(5, 1fr); }
+}
+
+@media (min-width: 3200px) {
+  :root {
+    --t-scale: 1.34;
+    --shell-max: 2320px;
+  }
+
+  /* Past this the bento tiles get uncomfortably wide and eye travel across
+     the card costs more than the extra fill is worth, so the width stops. */
 }
 
 /* Coarse pointers get no hover paint — it sticks after tap. */
