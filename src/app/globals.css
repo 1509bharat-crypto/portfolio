@@ -47,10 +47,10 @@
   /* Generous, Apple-ish corners that open up further as the card grows.
      Every radius is fluid for the same reason the type is: a fixed 15px
      corner on a 3000px card reads as a sharp edge. */
-  --r-sm: clamp(9px, 0.62vw, 15px);
-  --r-md: clamp(14px, 1.05vw, 23px);
-  --r-lg: clamp(17px, 1.3vw, 29px);
-  --r-xl: clamp(24px, 2vw, 46px);
+  --r-sm: clamp(12px, 0.85vw, 22px);
+  --r-md: clamp(18px, 1.45vw, 34px);
+  --r-lg: clamp(24px, 1.95vw, 44px);
+  --r-xl: clamp(34px, 3vw, 68px);
 }
 
 @media (prefers-color-scheme: dark) {
