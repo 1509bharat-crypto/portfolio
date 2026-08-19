@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LabGrid } from '@/components/LabGrid';
-import { TopBar } from '@/components/TopBar';
 
 export const metadata: Metadata = {
   title: 'Lab',
@@ -12,7 +11,6 @@ export const metadata: Metadata = {
 export default function LabPage() {
   return (
     <div className="shell">
-      <TopBar />
       <div className="frame">
         <div className="frame__body">
           <div className="labview">

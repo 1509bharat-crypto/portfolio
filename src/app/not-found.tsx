@@ -1,14 +1,14 @@
 import Link from 'next/link';
-import { TopBar } from '@/components/TopBar';
+import { IdentityBlock } from '@/components/Identity';
 import { BarLines } from '@/components/Primitives';
 
 export default function NotFound() {
   return (
     <div className="shell">
-      <TopBar />
       <div className="frame">
         <div className="frame__body">
-          <div className="focus__main" style={{ flex: 1 }}>
+          <div className="focusview">
+          <div className="focus__main">
             <span className="lab">404 · no such tile</span>
             <h1>This one isn&apos;t in the grid</h1>
             <p className="lisa-sub">
@@ -31,6 +31,20 @@ export default function NotFound() {
                 </Link>
               </div>
             </div>
+          </div>
+          <aside className="map" aria-label="Elsewhere">
+            <Link href="/" className="mapitem mapitem--back">
+              ⌗ Back to grid
+            </Link>
+            <div className="map__lab">Elsewhere</div>
+            <Link href="/story" className="mapitem">
+              The story
+            </Link>
+            <Link href="/lab" className="mapitem">
+              Lab
+            </Link>
+            <IdentityBlock />
+          </aside>
           </div>
         </div>
       </div>

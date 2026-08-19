@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { cases } from '@/data/cases';
+import { IdentityBlock } from './Identity';
 
 /**
  * The column that keeps every case study one click away while you're reading
@@ -70,6 +71,8 @@ export function CaseMap({
       <Link href="/lab" className="mapitem">
         Lab
       </Link>
+
+      <IdentityBlock />
     </aside>
   );
 }

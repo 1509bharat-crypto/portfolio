@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CaseDetail } from '@/components/CaseDetail';
 import { CaseMap } from '@/components/CaseMap';
-import { TopBar } from '@/components/TopBar';
 import { cases, getCase } from '@/data/cases';
 
 type Props = { params: Promise<{ slug: string }> };
@@ -37,7 +36,6 @@ export default async function CasePage({ params }: Props) {
 
   return (
     <div className="shell">
-      <TopBar />
       <div className="frame">
         <div className="frame__body">
           <div className="focusview">

@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { flagship, otherCases, primaryCases } from '@/data/cases';
 import { lab } from '@/data/lab';
 import { profile } from '@/data/profile';
+import { IdentityTile } from './IdentityTile';
 import { springCrisp } from '@/lib/motion';
 import { BarLines, CellHead, Chips, Placeholder } from './Primitives';
 
@@ -55,13 +56,9 @@ export function BentoGrid({
         </p>
       </motion.section>
 
-      {/* Now. */}
-      <motion.section className="cell cell--slim c-now" variants={cell}>
-        <CellHead label="Now" />
-        <p className="storyline">
-          <span className="dot" aria-hidden />
-          <b>{profile.now.where}.</b> {profile.now.what}
-        </p>
+      {/* Who I am, what I'm doing, how to reach me — the old top bar. */}
+      <motion.section className="cell c-me" variants={cell}>
+        <IdentityTile />
       </motion.section>
 
       {/* 01 — flagship. */}

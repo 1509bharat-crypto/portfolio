@@ -30,7 +30,7 @@
      smoothly from 15px at 1240px wide to 20px at 3200px. Deriving by ratio
      rather than stepping at breakpoints means no width where the card has
      grown but the type hasn't caught up yet. */
-  --t-body: clamp(15px, 0.255vw + 11.84px, 20px);
+  --t-body: clamp(15px, 0.357vw + 10.57px, 22px);
   --t-label: calc(var(--t-body) * 0.667);
   --t-track: 0.14em;
   --t-xs: calc(var(--t-body) * 0.767);
@@ -44,10 +44,13 @@
   --shell-pad: clamp(10px, 1.2vw, 30px);
   --shell-gap: clamp(10px, 0.9vw, 18px);
 
-  --r-sm: 8px;
-  --r-md: 12px;
-  --r-lg: 15px;
-  --r-xl: 22px;
+  /* Generous, Apple-ish corners that open up further as the card grows.
+     Every radius is fluid for the same reason the type is: a fixed 15px
+     corner on a 3000px card reads as a sharp edge. */
+  --r-sm: clamp(9px, 0.62vw, 15px);
+  --r-md: clamp(14px, 1.05vw, 23px);
+  --r-lg: clamp(17px, 1.3vw, 29px);
+  --r-xl: clamp(24px, 2vw, 46px);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -149,6 +152,10 @@ a {
   display: flex;
   flex-direction: column;
   gap: var(--shell-gap);
+  /* An explicit height, not just a floor. With height:auto the card's flex:1
+     has no definite size to grow into, so it sizes to content and overshoots
+     the viewport by a few pixels. The stacking tiers below reset this. */
+  height: 100svh;
   min-height: 100svh;
 }
 
@@ -172,51 +179,66 @@ a {
   min-height: 0;
 }
 
-/* ---------- top bar ---------- */
-.dock {
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow);
-  padding: 10px 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  background: var(--card);
-}
-
-.dock__home {
+/* ---------- identity tile (was the floating top bar) ---------- */
+.me__name {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: var(--t-md);
+  font-size: var(--t-lg);
   font-weight: 600;
-  letter-spacing: -0.015em;
-  transition: color 0.16s;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
-.dock__home .mono {
-  font-size: 11px;
-  color: var(--accent);
-}
-
-.dock__home:hover {
-  color: var(--accent);
-}
-
-.dock__meta {
+.me__mark {
   font-size: var(--t-xs);
-  color: var(--muted);
-  display: flex;
-  align-items: center;
+  color: var(--accent);
 }
 
-.dock__links {
+.me__role {
+  margin-top: -4px;
+}
+
+/* The now line and the contact buttons sit against the bottom edge, so the
+   tile reads name-first and reaches-me-last. */
+.me__now {
+  margin-top: auto;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line);
+}
+
+.me__links {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  align-items: center;
+}
+
+.me__links .wbtn {
+  flex: 1 1 auto;
+  min-width: 84px;
+  text-align: center;
+}
+
+.me__links--compact .wbtn {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 5px 9px;
+  font-size: var(--t-xs);
+}
+
+/* Identity at the foot of the map column, so name and contact stay reachable
+   inside a case study now that there is no bar above the card. */
+.map__id {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.map__id .me__name {
+  font-size: var(--t-md);
 }
 
 /* ---------- wireframe primitives ---------- */
@@ -231,8 +253,8 @@ a {
 }
 
 .bar {
-  height: 8px;
-  border-radius: 4px;
+  height: clamp(7px, 0.5vw, 11px);
+  border-radius: 999px;
   background: var(--line);
 }
 
@@ -255,7 +277,7 @@ a {
     ),
     var(--ph);
   border: 1px solid var(--line);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   /* The cross is scaffolding, not content — keep it below the type. */
   opacity: 0.7;
 }
@@ -282,8 +304,8 @@ a {
 }
 
 .dot {
-  width: 7px;
-  height: 7px;
+  width: calc(var(--t-body) * 0.47);
+  height: calc(var(--t-body) * 0.47);
   border-radius: 50%;
   background: var(--live);
   display: inline-block;
@@ -379,9 +401,12 @@ a {
   gap: clamp(10px, 0.75vw, 16px);
   padding: clamp(10px, 0.85vw, 18px);
   grid-template-columns: 1.05fr 1.05fr 1fr 1fr;
-  grid-template-rows: 0.95fr 1.1fr 0.7fr;
+  /* minmax(0, …) rather than a bare fr: an fr track's implicit minimum is
+     auto, so a tall tile can push the grid past the card's height and make
+     the page scroll by a few pixels. */
+  grid-template-rows: minmax(0, 0.95fr) minmax(0, 1.1fr) minmax(0, 0.7fr);
   grid-template-areas:
-    'id    id    id     now'
+    'id    id    id     me'
     'lisa  lisa  robin  cs3'
     'lisa  lisa  others lab';
   min-height: 0;
@@ -420,7 +445,7 @@ a {
 .c-lisa { grid-area: lisa; }
 .c-robin { grid-area: robin; }
 .c-cs3 { grid-area: cs3; }
-.c-now { grid-area: now; }
+.c-me { grid-area: me; }
 .c-others { grid-area: others; }
 .c-lab { grid-area: lab; }
 
@@ -439,7 +464,6 @@ a {
    baseline so a tile reads as a framed composition rather than a top-aligned
    fragment. Only applies where the grid actually gives a tile spare height. */
 @media (min-width: 760px) {
-  .c-now .storyline,
   .c-others .storyline,
   .c-lab .storyline {
     margin-block: auto;
@@ -750,6 +774,10 @@ a {
      the bento stacks. `1 0 auto` lets it do both: take its content height and
      scroll when that is taller than the screen, but still stretch to fill
      when it is shorter, so the bottom inset matches the other three. */
+  .shell {
+    height: auto;
+  }
+
   .frame {
     flex: 1 0 auto;
   }
@@ -759,8 +787,8 @@ a {
     grid-template-rows: none;
     grid-auto-rows: minmax(112px, auto);
     grid-template-areas:
+      'me     me'
       'id     id'
-      'now    now'
       'lisa   lisa'
       'robin  cs3'
       'others lab';
@@ -804,13 +832,11 @@ a {
     gap: 10px;
   }
 
-  .frame { border-radius: 18px; }
-
   .bento {
     grid-template-columns: 1fr;
     grid-template-areas:
+      'me'
       'id'
-      'now'
       'lisa'
       'robin'
       'cs3'
@@ -818,17 +844,6 @@ a {
       'lab';
     padding: 10px;
   }
-
-  .dock {
-    /* Name and availability read first; the links wrap under them. */
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .dock__links { width: 100%; }
-
-  .wbtn { flex: 1; text-align: center; }
 
   .focus__main { padding: 18px 16px 28px; }
   .labview__head { padding: 16px 16px 10px; }
@@ -864,6 +879,22 @@ a {
 @media (min-width: 2200px) {
   .focusview { grid-template-columns: 1fr 300px; }
   .labgrid { grid-template-columns: repeat(5, 1fr); }
+}
+
+/* Continuous (squircle) corners where supported — the difference between a
+   rounded rectangle and the Apple curve. Everything falls back to the plain
+   radius above, so this is purely additive. */
+@supports (corner-shape: squircle) {
+  .frame,
+  .cell,
+  .labbox,
+  .dblock,
+  .ph,
+  .wbtn,
+  .mapitem,
+  .labbox__toggle {
+    corner-shape: squircle;
+  }
 }
 
 /* Coarse pointers get no hover paint — it sticks after tap. */

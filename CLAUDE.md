@@ -38,6 +38,9 @@ Three things live in exactly one place. Use them; don't inline alternatives:
 - **Unwritten copy is intentional.** A `Block` with no `body` renders as wireframe bars. That is the design while a story is unwritten — do not invent case study prose to fill it.
 - **`params` is a Promise** (Next 16 removed sync access). `const { slug } = await params`.
 - **OG images are rendered by Satori, not a browser.** It supports a CSS subset: flex only, and any element with more than one child needs an explicit `display`. JSX counts each text fragment as a child, so `{a}, {b}` is three children — interpolate once instead.
+- **Identity renders in two places.** `IdentityTile` (the bento tile) and `IdentityBlock` (the foot of the map column) both come from `src/components/Identity.tsx` and `profile.ts`. There is no top bar; removing the map column from a view would strip contact from it.
+- **`.shell` needs an explicit `height`, not just `min-height`.** With `height: auto` the card's `flex: 1` has no definite size to grow into, sizes to content, and overshoots the viewport by a few pixels. The stacking tiers below 1100px reset it to `auto` on purpose.
+- **Bento rows use `minmax(0, Xfr)`.** A bare `fr` track has an implicit `auto` minimum, so a tall tile pushes the grid past the card.
 - **Motion `layoutId`s must stay paired.** `case-title-${slug}` sits on both the grid tile and the detail heading; renaming one side silently kills the shared-element morph rather than erroring.
 - **Overlays go `position: fixed` below 1100px.** They're absolutely positioned inside the card above that. Any change to `.focusview` / `.labview` needs checking at both sides of that breakpoint.
 - **The URL is driven by `history.pushState`, not the router.** `BentoCard` keeps `/work/<slug>` and `/lab` in the address bar without navigating, and a `popstate` listener syncs state back. A cold load of those URLs hits the real route instead. Both paths must keep working.

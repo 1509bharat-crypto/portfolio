@@ -6,7 +6,7 @@ Personal portfolio site for Bharat Bharat, product designer in Amsterdam. Curren
 
 A single bento card, everything scannable at a glance, minimal scrolling.
 
-- A floating top bar owns the name, availability, and contact from every page.
+- Name, availability, what I'm doing now and contact live in their own bento tile — no floating bar above the card. Inside a case study, the story or a lab log, the same block sits at the foot of the map column.
 - The card leads with the pitch at display size, then the work band in strict priority order: case study 01 (flagship) → 02 → 03 → other case studies → lab.
 - Clicking a case study opens one case study per view with a mini map of all of them.
 - The lab is a full card grid of experiment boxes that expand in place.

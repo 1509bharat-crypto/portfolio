@@ -9,7 +9,6 @@ import { CaseDetail } from './CaseDetail';
 import { CaseMap } from './CaseMap';
 import { StoryDetail } from './StoryDetail';
 import { LabGrid } from './LabGrid';
-import { TopBar } from './TopBar';
 
 type View =
   | { kind: 'grid' }
@@ -116,8 +115,6 @@ export function BentoCard({ initialView }: { initialView?: View }) {
 
   return (
     <div className="shell">
-      <TopBar onHome={close} />
-
       <div className="frame">
         <div className="frame__body">
           <BentoGrid

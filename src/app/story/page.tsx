@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { CaseMap } from '@/components/CaseMap';
 import { StoryDetail } from '@/components/StoryDetail';
-import { TopBar } from '@/components/TopBar';
 import { story } from '@/data/story';
 
 export const metadata: Metadata = {
@@ -12,7 +11,6 @@ export const metadata: Metadata = {
 export default function StoryPage() {
   return (
     <div className="shell">
-      <TopBar />
       <div className="frame">
         <div className="frame__body">
           <div className="focusview">

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { TopBar } from '@/components/TopBar';
+import { IdentityBlock } from '@/components/Identity';
 import { BarLines, Placeholder } from '@/components/Primitives';
 import { lab } from '@/data/lab';
 
@@ -32,7 +32,6 @@ export default async function LabEntryPage({ params }: Props) {
 
   return (
     <div className="shell">
-      <TopBar />
       <div className="frame">
         <div className="frame__body">
           <div className="focusview">
@@ -79,6 +78,8 @@ export default async function LabEntryPage({ params }: Props) {
               <Link href="/" className="mapitem">
                 The bento card
               </Link>
+
+              <IdentityBlock />
             </aside>
           </div>
         </div>
