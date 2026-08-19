@@ -26,21 +26,23 @@
      ground instead of floating over it. */
   --shadow: 0 1px 2px rgba(19, 22, 27, 0.05), 0 14px 34px rgba(19, 22, 27, 0.07);
 
-  /* Type scale. Every size in the system comes from here, and --t-scale is
-     the single knob that steps the whole thing up on large displays. */
-  --t-scale: 1;
-  --t-label: calc(10px * var(--t-scale));
+  /* Type scale. Everything derives from one fluid body size, which grows
+     smoothly from 15px at 1240px wide to 20px at 3200px. Deriving by ratio
+     rather than stepping at breakpoints means no width where the card has
+     grown but the type hasn't caught up yet. */
+  --t-body: clamp(15px, 0.255vw + 11.84px, 20px);
+  --t-label: calc(var(--t-body) * 0.667);
   --t-track: 0.14em;
-  --t-xs: calc(11.5px * var(--t-scale));
-  --t-sm: calc(12.5px * var(--t-scale));
-  --t-md: calc(13.5px * var(--t-scale));
-  --t-body: calc(15px * var(--t-scale));
-  --t-lg: calc(17px * var(--t-scale));
+  --t-xs: calc(var(--t-body) * 0.767);
+  --t-sm: calc(var(--t-body) * 0.833);
+  --t-md: calc(var(--t-body) * 0.9);
+  --t-lg: calc(var(--t-body) * 1.133);
 
-  /* Card width and the rhythm around it grow with the same steps. */
-  --shell-max: 1240px;
-  --shell-pad: 14px;
-  --shell-gap: 12px;
+  /* No max-width. Centring inside one is what produced side margins larger
+     than the top and bottom; the card is inset by --shell-pad on all four
+     sides instead, so the frame around it is even at every width. */
+  --shell-pad: clamp(10px, 1.2vw, 30px);
+  --shell-gap: clamp(10px, 0.9vw, 18px);
 
   --r-sm: 8px;
   --r-md: 12px;
@@ -143,9 +145,7 @@ a {
  * natural height (page scrolls) once the bento has to stack.
  * ------------------------------------------------------------------ */
 .shell {
-  max-width: var(--shell-max);
-  margin: 0 auto;
-  padding: var(--shell-pad) var(--shell-pad) calc(var(--shell-pad) + 6px);
+  padding: var(--shell-pad);
   display: flex;
   flex-direction: column;
   gap: var(--shell-gap);
@@ -376,8 +376,8 @@ a {
 .bento {
   flex: 1;
   display: grid;
-  gap: 10px;
-  padding: 12px;
+  gap: clamp(10px, 0.75vw, 16px);
+  padding: clamp(10px, 0.85vw, 18px);
   grid-template-columns: 1.05fr 1.05fr 1fr 1fr;
   grid-template-rows: 0.95fr 1.1fr 0.7fr;
   grid-template-areas:
@@ -390,7 +390,7 @@ a {
 .cell {
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  padding: 14px 16px;
+  padding: clamp(13px, 1vw, 18px) clamp(15px, 1.15vw, 21px);
   display: flex;
   flex-direction: column;
   gap: 9px;
@@ -483,7 +483,7 @@ a {
 
 /* Type scale: name > flagship > case titles > body > labels. */
 .claim {
-  font-size: clamp(20px, 2.2vw, calc(29px * var(--t-scale)));
+  font-size: clamp(20px, 2.2vw, calc(var(--t-body) * 1.95));
   font-weight: 600;
   color: var(--ink);
   /* Tracking tightens as the size grows; 700 at display size reads as shouting. */
@@ -495,7 +495,7 @@ a {
 }
 
 .lisa-title {
-  font-size: clamp(21px, 2.3vw, calc(28px * var(--t-scale)));
+  font-size: clamp(21px, 2.3vw, calc(var(--t-body) * 1.87));
   font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.15;
@@ -582,7 +582,7 @@ a {
 }
 
 .focus__main h1 {
-  font-size: clamp(22px, 2.4vw, calc(29px * var(--t-scale)));
+  font-size: clamp(22px, 2.4vw, calc(var(--t-body) * 1.95));
   font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.14;
@@ -660,7 +660,7 @@ a {
 }
 
 .labview__head h1 {
-  font-size: clamp(22px, 2.4vw, calc(29px * var(--t-scale)));
+  font-size: clamp(22px, 2.4vw, calc(var(--t-body) * 1.95));
   font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.14;
@@ -746,14 +746,12 @@ a {
  * <760      single column stack in priority order
  * ------------------------------------------------------------------ */
 @media (max-width: 1099px) {
-  .shell {
-    min-height: 0;
-    padding: 12px 12px 18px;
-  }
-
-  /* Stop pinning the card to the viewport: let content set the height. */
+  /* Below this width the card has to be able to grow past the viewport as
+     the bento stacks. `1 0 auto` lets it do both: take its content height and
+     scroll when that is taller than the screen, but still stretch to fill
+     when it is shorter, so the bottom inset matches the other three. */
   .frame {
-    flex: none;
+    flex: 1 0 auto;
   }
 
   .bento {
@@ -803,7 +801,6 @@ a {
 
 @media (max-width: 759px) {
   .shell {
-    padding: 10px 10px 16px;
     gap: 10px;
   }
 
@@ -853,60 +850,20 @@ a {
 /* ------------------------------------------------------------------ *
  * Large displays.
  *
- * The concept is one card filling the viewport, so on a big screen the card
- * has to grow — capped at 1240px it floats in a field of grey. Everything
- * steps together off --t-scale, so proportions hold rather than the card
- * getting wider around type that stayed small. Line length is still governed
- * by the ch-based max-widths on .claim and .lisa-sub, so nothing runs long.
+ * Width, type and spacing are all fluid above, so there is no step where the
+ * card stalls at a fixed width while the screen keeps growing. Only things
+ * that genuinely cannot interpolate — column counts — get a breakpoint.
  * ------------------------------------------------------------------ */
-@media (min-width: 1440px) {
-  :root {
-    --t-scale: 1.06;
-    --shell-max: 1400px;
-    --shell-pad: 18px;
-    --shell-gap: 14px;
-  }
-
-  .bento { gap: 12px; padding: 14px; }
-  .cell { padding: 16px 18px; }
-}
-
-@media (min-width: 1920px) {
-  :root {
-    --t-scale: 1.15;
-    --shell-max: 1660px;
-    --shell-pad: 24px;
-    --shell-gap: 16px;
-  }
-
-  .bento { gap: 14px; padding: 16px; }
-  .cell { padding: 18px 20px; }
+@media (min-width: 1600px) {
   .focusview { grid-template-columns: 1fr 260px; }
   .focus__main { padding: 30px 34px; }
   /* Three columns of experiment box get uncomfortably wide past this point. */
   .labgrid { grid-template-columns: repeat(4, 1fr); }
 }
 
-@media (min-width: 2560px) {
-  :root {
-    --t-scale: 1.26;
-    --shell-max: 2000px;
-    --shell-pad: 30px;
-  }
-
-  .bento { gap: 16px; padding: 18px; }
+@media (min-width: 2200px) {
   .focusview { grid-template-columns: 1fr 300px; }
   .labgrid { grid-template-columns: repeat(5, 1fr); }
-}
-
-@media (min-width: 3200px) {
-  :root {
-    --t-scale: 1.34;
-    --shell-max: 2320px;
-  }
-
-  /* Past this the bento tiles get uncomfortably wide and eye travel across
-     the card costs more than the extra fill is worth, so the width stops. */
 }
 
 /* Coarse pointers get no hover paint — it sticks after tap. */
