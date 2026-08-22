@@ -50,8 +50,8 @@ export function LabGrid() {
 
               <Placeholder />
 
-              <motion.span layout="position" className="storyline">
-                <b>{entry.title}.</b> {entry.blurb}
+              <motion.span layout="position" className="headline">
+                {entry.question}
               </motion.span>
             </button>
 

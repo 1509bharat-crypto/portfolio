@@ -31,6 +31,12 @@ export type CaseStudy = {
   rank: CaseRank;
   kicker: string;
   title: string;
+  /**
+   * The one line the grid tile carries. Conversational, and it should land the
+   * arc — what the situation was, and what changed — so the tile needs no
+   * supporting prose beneath it. Keep it under about fifteen words.
+   */
+  headline: string;
   tagline: string;
   summary: string;
   stats?: Stat[];
@@ -44,6 +50,8 @@ export type LabEntry = {
   slug: string;
   category: string;
   title: string;
+  /** The open question, asked plainly. This is the tile's whole text. */
+  question: string;
   blurb: string;
   status: string;
   /** Shown when the box expands in place. */

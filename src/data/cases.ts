@@ -12,6 +12,7 @@ export const cases: CaseStudy[] = [
     rank: 'flagship',
     kicker: 'Case study · flagship · 2023–2025',
     title: 'Lisa → Mona',
+    headline: 'Replaced the employee survey with 120k+ real conversations.',
     tagline:
       'Voice AI that replaced employee surveys with real conversations. Designed and built end-to-end.',
     summary:
@@ -35,6 +36,7 @@ export const cases: CaseStudy[] = [
     rank: 'primary',
     kicker: 'Case study · current · Robin, Utrecht',
     title: 'Robin',
+    headline: 'Blue-collar recruiting, rebuilt around AI workflows.',
     tagline: 'Recruiting workflows, redesigned around AI.',
     summary:
       'Recruitment platform for blue-collar workers. Seamless AI workflows for faster recruiting.',
@@ -50,6 +52,7 @@ export const cases: CaseStudy[] = [
     slot: true,
     kicker: 'Case study 03 · slot',
     title: 'Next shipped story',
+    headline: 'Reserved for whatever ships next.',
     tagline: 'Reserved top-three slot.',
     summary:
       'Reserved top-three slot. One data entry fills this tile and this detail view.',
@@ -62,6 +65,7 @@ export const cases: CaseStudy[] = [
     slot: true,
     kicker: 'Case study 04 · slot',
     title: 'Case study 04',
+    headline: 'One data entry fills this tile and its detail view.',
     tagline: 'Lives in the other case studies tile.',
     summary:
       'Lives in the other case studies tile on the grid, and still gets the same full card and map row here.',
@@ -74,6 +78,7 @@ export const cases: CaseStudy[] = [
     slot: true,
     kicker: 'Case study 05 · slot',
     title: 'Case study 05',
+    headline: 'Same template, one more entry.',
     tagline: 'Same template, one more data entry.',
     summary:
       'Same template, one more data entry. The map column simply grows by a row.',

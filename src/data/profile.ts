@@ -15,8 +15,8 @@ export const profile: Profile = {
     'AI-assisted build',
     'Systems thinking',
   ],
-  story:
-    'Engineer → industrial → ethnography → product. One throughline: how people and things communicate.',
+  // The tile carries the arc only; the throughline itself is the story page.
+  story: 'Engineer → industrial → ethnography → product.',
   now: {
     where: 'Robin, Utrecht',
     what: 'AI recruiting workflows. Open to senior IC roles.',

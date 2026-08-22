@@ -467,16 +467,6 @@ a {
    baseline so a tile reads as a framed composition rather than a top-aligned
    fragment. Only applies where the grid actually gives a tile spare height. */
 @media (min-width: 760px) {
-  .c-others .storyline,
-  .c-lab .storyline {
-    margin-block: auto;
-  }
-
-  .c-robin > *:last-child,
-  .c-cs3 > *:last-child {
-    margin-top: auto;
-  }
-
   /* Two auto margins in one column split the slack evenly, so the pitch and
      its disciplines float in the middle of the tile with the label pinned
      top and the throughline pinned to the rule at the bottom. */
@@ -521,18 +511,37 @@ a {
   margin-block: 2px 4px;
 }
 
-.lisa-title {
-  font-size: clamp(21px, 2.3vw, calc(var(--t-body) * 1.87));
+/* One line of text per block, sized to carry the tile on its own. The mono
+   label above it holds the project name, so this is free to say what changed. */
+.headline {
+  font-size: clamp(16px, 1.35vw, calc(var(--t-body) * 1.4));
   font-weight: 600;
-  letter-spacing: -0.025em;
-  line-height: 1.15;
+  letter-spacing: -0.018em;
+  line-height: 1.25;
+  color: var(--ink);
+  max-width: 26ch;
+  text-wrap: balance;
 }
 
-.cs-title {
-  font-size: var(--t-lg);
-  font-weight: 600;
-  letter-spacing: -0.017em;
-  line-height: 1.2;
+.headline--lead {
+  font-size: clamp(20px, 2.05vw, calc(var(--t-body) * 1.8));
+  letter-spacing: -0.026em;
+  line-height: 1.17;
+  max-width: 21ch;
+}
+
+/* The short tiles have no visual, so their line settles into the middle. */
+.headline--small {
+  font-size: var(--t-md);
+  letter-spacing: -0.008em;
+  max-width: 32ch;
+  margin-block: auto;
+}
+
+/* The project name inside the mono label. */
+.lab__name {
+  color: var(--ink);
+  font-weight: 500;
 }
 
 .csnum {

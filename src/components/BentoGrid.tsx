@@ -2,15 +2,40 @@
 
 import { motion, useReducedMotion } from 'motion/react';
 import { flagship, otherCases, primaryCases } from '@/data/cases';
-import { lab } from '@/data/lab';
+import { labIntro } from '@/data/lab';
 import { profile } from '@/data/profile';
-import { IdentityTile } from './IdentityTile';
 import { springCrisp } from '@/lib/motion';
-import { BarLines, CellHead, Chips, Placeholder } from './Primitives';
+import type { CaseStudy } from '@/lib/types';
+import { IdentityTile } from './IdentityTile';
+import { Chips, Label, Placeholder } from './Primitives';
+
+/**
+ * The label row: the project name, which morphs into the detail heading, plus
+ * where the study sits in the order. Defined at module scope — a component
+ * created during render remounts every time, which would break the morph.
+ */
+function Head({ study, rank }: { study: CaseStudy; rank: string }) {
+  return (
+    <div className="cellhead">
+      <span className="lab">
+        <motion.span layoutId={`case-title-${study.slug}`} className="lab__name">
+          {study.title}
+        </motion.span>
+        <span aria-hidden> · </span>
+        {rank}
+      </span>
+      <span className="csnum">{study.number}</span>
+    </div>
+  );
+}
 
 /**
  * The work band reads in strict priority order:
  * 01 (flagship) → 02 → 03 → other case studies → lab.
+ *
+ * A block is one line of text and one visual. The mono label carries the
+ * project name so the display type is free to carry what changed — the tile
+ * says what the work was worth, not what it was called.
  */
 export function BentoGrid({
   onOpenCase,
@@ -30,7 +55,6 @@ export function BentoGrid({
     },
   };
 
-  // Tiles arrive in reading order, each one settling before the next commits.
   const cell = reduced
     ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
     : {
@@ -44,12 +68,11 @@ export function BentoGrid({
     <motion.div className="bento" variants={container} initial="hidden" animate="show">
       {/* The pitch, at display size. */}
       <motion.section className="cell c-id" variants={cell}>
-        <CellHead label="The pitch / story" />
+        <Label>The pitch</Label>
         <p className="claim">{profile.pitch}</p>
         <Chips items={profile.disciplines} />
         <p className="idstory">
-          <b>{profile.story.split('.')[0]}.</b>
-          {profile.story.slice(profile.story.indexOf('.') + 1)}{' '}
+          <b>{profile.story}</b>{' '}
           <button className="go" onClick={onOpenStory}>
             Read the story →
           </button>
@@ -68,11 +91,8 @@ export function BentoGrid({
         onClick={() => onOpenCase(flagship.slug)}
         aria-label={`Open case study: ${flagship.title}`}
       >
-        <CellHead label="Case study · flagship" number={flagship.number} />
-        <motion.div className="lisa-title" layoutId={`case-title-${flagship.slug}`}>
-          {flagship.title}
-        </motion.div>
-        <p className="lisa-sub">{flagship.tagline}</p>
+        <Head study={flagship} rank="flagship" />
+        <p className="headline headline--lead">{flagship.headline}</p>
         {flagship.stats?.length ? (
           <div className="stats">
             {flagship.stats.map((s) => (
@@ -83,22 +103,14 @@ export function BentoGrid({
             ))}
           </div>
         ) : null}
-        <Placeholder />
-        <div className="meta">
-          {flagship.stack?.map((t, i) => (
-            <span key={t}>
-              {t}
-              {i < flagship.stack!.length - 1 ? <span aria-hidden> ·</span> : null}
-            </span>
-          ))}
-        </div>
+        <Placeholder className="flex-1" />
       </motion.button>
 
       {/* 02 and 03. */}
       {[
-        { study: second, cls: 'c-robin' },
-        { study: third, cls: 'c-cs3' },
-      ].map(({ study, cls }) => (
+        { study: second, cls: 'c-robin', rank: 'current' },
+        { study: third, cls: 'c-cs3', rank: 'slot' },
+      ].map(({ study, cls, rank }) => (
         <motion.button
           key={study.slug}
           className={`cell cell--click ${cls}`}
@@ -106,15 +118,9 @@ export function BentoGrid({
           onClick={() => onOpenCase(study.slug)}
           aria-label={`Open case study: ${study.title}`}
         >
-          <CellHead
-            label={study.slot ? 'Case study · slot' : 'Case study'}
-            number={study.number}
-          />
-          <motion.div className="cs-title" layoutId={`case-title-${study.slug}`}>
-            {study.title}
-          </motion.div>
-          <p className="storyline">{study.tagline}</p>
-          <BarLines widths={[80, 40]} />
+          <Head study={study} rank={rank} />
+          <p className="headline">{study.headline}</p>
+          <Placeholder className="flex-1" />
         </motion.button>
       ))}
 
@@ -125,14 +131,12 @@ export function BentoGrid({
         onClick={() => onOpenCase(otherCases[0].slug)}
         aria-label="Open other case studies"
       >
-        <CellHead label="Other case studies" number={`${otherCases[0]?.number}+`} />
-        <p className="storyline">
-          {otherCases.map((c, i) => (
-            <span key={c.slug}>
-              <b>{c.title}</b>
-              {i < otherCases.length - 1 ? ' · ' : ' →'}
-            </span>
-          ))}
+        <div className="cellhead">
+          <Label>Other case studies</Label>
+          <span className="csnum">{`${otherCases[0]?.number}+`}</span>
+        </div>
+        <p className="headline headline--small">
+          {otherCases.map((c) => c.title).join(' · ')} →
         </p>
       </motion.button>
 
@@ -143,15 +147,10 @@ export function BentoGrid({
         onClick={onOpenLab}
         aria-label="Open the lab"
       >
-        <CellHead label="Lab" />
-        <p className="storyline">
-          {lab.map((e, i) => (
-            <span key={e.slug}>
-              <b>{e.title}</b>
-              {i < lab.length - 1 ? ' · ' : ''}
-            </span>
-          ))}
-        </p>
+        <div className="cellhead">
+          <Label>Lab</Label>
+        </div>
+        <p className="headline headline--small">{labIntro}</p>
       </motion.button>
     </motion.div>
   );
