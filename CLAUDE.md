@@ -20,6 +20,19 @@ The grid tiles, detail views, map column, `generateStaticParams`, OG images and 
 
 Priority is list order in `cases.ts`: first entry takes the flagship tile, the next two get their own tiles, `rank: 'other'` entries become rows in the "other case studies" tile. Promoting a story means moving its entry up.
 
+## Design rules
+
+Three levers carry the work: **typography, motion, visuals**. Text is the last resort, not the first. `npm run design` enforces what is enforceable — run it before calling a visual change done.
+
+1. **One view on desktop.** At 1100px and up every route fits the viewport: no page scroll, and no element scrolling internally. If something doesn't fit, cut it or put it behind an interaction. Never add a scrollbar.
+2. **Mobile may scroll**, and may reach the same understanding through different interactions. It is not a squeezed desktop.
+3. **Word budgets.** Home ≤ 160 words on screen, any other view ≤ 120, any single block ≤ 25. A block is a title plus a visual; prose is the exception that has to earn itself.
+4. **Hierarchy before explanation.** If you can't tell what matters with the text blurred, the typography is doing too little and the copy too much. Fix the type, don't add a sentence.
+5. **Motion must inform.** Every animation says where something came from, what changed, or what is live. Bars draw because a wireframe rule gets drawn; the dot breathes because availability is the one live fact. No ambient decoration.
+6. **One accent.** The neutral ramp and hairlines do everything else. A second hue needs a reason.
+7. **AA in both themes.** `--line-strong` is a border value and fails as text; use `--numeral` for quiet type.
+8. **Reduced motion is respected** by every animation, via `useReducedMotion()` or the global media query.
+
 ## The wireframe owns the skeleton; the site owns the finish
 
 `wireframes/bento-wireframe.html` is the locked layout — grid areas, priority order, interaction model. Change the skeleton there first, then port.

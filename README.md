@@ -23,6 +23,10 @@ A single bento card, everything scannable at a glance, minimal scrolling.
 - Every route is built: `/` (the bento card), `/story`, `/work/[slug]`, `/lab`, `/lab/[slug]`, a styled 404, plus generated OG images, sitemap and robots. 22 prerendered routes.
 - Next: real case study writing, and imagery to replace the placeholders.
 
+## Design rules
+
+Simple, minimal, informative — carried by typography, motion and visuals rather than copy. One view on desktop, no scrolling; mobile may scroll or use different interactions. Full list in `CLAUDE.md`; `npm run design` checks the enforceable ones across every route, width and theme.
+
 ## Reference projects
 
 Selected work lives in these repos:
