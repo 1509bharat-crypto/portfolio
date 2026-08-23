@@ -24,7 +24,7 @@ Priority is list order in `cases.ts`: first entry takes the flagship tile, the n
 
 Three levers carry the work: **typography, motion, visuals**. Text is the last resort, not the first. `npm run design` enforces what is enforceable — run it before calling a visual change done.
 
-1. **One view on desktop.** At 1100px and up every route fits the viewport: no page scroll, and no element scrolling internally. If something doesn't fit, cut it or put it behind an interaction. Never add a scrollbar.
+1. **One card in focus on desktop.** Home is a horizontal deck: vertical scroll drives horizontal travel, full-height snap stops keep exactly one card centered, and the track zooms with scroll velocity. Detail views fit the viewport with no internal scrolling beyond their own content area.
 2. **Mobile may scroll**, and may reach the same understanding through different interactions. It is not a squeezed desktop.
 3. **Word budgets.** Home ≤ 160 words on screen, any other view ≤ 120, any single block ≤ 25. A block is a title plus a visual; prose is the exception that has to earn itself.
 4. **Hierarchy before explanation.** If you can't tell what matters with the text blurred, the typography is doing too little and the copy too much. Fix the type, don't add a sentence.
@@ -35,7 +35,7 @@ Three levers carry the work: **typography, motion, visuals**. Text is the last r
 
 ## The wireframe owns the skeleton; the site owns the finish
 
-`wireframes/bento-wireframe.html` is the locked layout — grid areas, priority order, interaction model. Change the skeleton there first, then port.
+`wireframes/bento-wireframe.html` documents the earlier bento direction and is now historical: the home layout has moved to the horizontal deck (`src/components/HorizontalDeck.tsx`). Priority order and the detail-view pager survive from it.
 
 The *visual* layer has deliberately moved past it (design pass): the palette, type scale and radii in `src/app/globals.css` are the current truth and the wireframe's values are stale. Don't "fix" the site back to match the wireframe's colours or type sizes.
 
@@ -51,7 +51,7 @@ Three things live in exactly one place. Use them; don't inline alternatives:
 - **Unwritten copy is intentional.** A `Block` with no `body` renders as wireframe bars. That is the design while a story is unwritten — do not invent case study prose to fill it.
 - **`params` is a Promise** (Next 16 removed sync access). `const { slug } = await params`.
 - **OG images are rendered by Satori, not a browser.** It supports a CSS subset: flex only, and any element with more than one child needs an explicit `display`. JSX counts each text fragment as a child, so `{a}, {b}` is three children — interpolate once instead.
-- **Identity renders in two places.** `IdentityTile` (the bento tile) and `IdentityBlock` (the foot of the map column) both come from `src/components/Identity.tsx` and `profile.ts`. There is no top bar; removing the map column from a view would strip contact from it.
+- **Contact lives in the pager and the deck's last card**, both fed by `Identity.tsx` and `profile.ts`. There is no top bar; removing the pager from a detail view would strip contact from it.
 - **`.shell` needs an explicit `height`, not just `min-height`.** With `height: auto` the card's `flex: 1` has no definite size to grow into, sizes to content, and overshoots the viewport by a few pixels. The stacking tiers below 1100px reset it to `auto` on purpose.
 - **Bento rows use `minmax(0, Xfr)`.** A bare `fr` track has an implicit `auto` minimum, so a tall tile pushes the grid past the card.
 - **Motion `layoutId`s must stay paired.** `case-title-${slug}` sits on both the grid tile and the detail heading; renaming one side silently kills the shared-element morph rather than erroring.
@@ -68,7 +68,7 @@ Three things live in exactly one place. Use them; don't inline alternatives:
 
 ## Routes
 
-Every route is prerendered. `/` is the bento card; `/story`, `/work/[slug]` and `/lab` also open as overlays from it, and exist as standalone pages for direct links. `/lab/[slug]` is page-only — the lab log is a navigation, not a nested overlay.
+Every route is prerendered. `/` is the horizontal deck; `/story`, `/work/[slug]`, `/lab` and `/lab/[slug]` also open as overlays from it, and exist as standalone pages for direct links.
 
 ## Not yet done
 

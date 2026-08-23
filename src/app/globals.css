@@ -594,13 +594,147 @@ a {
 }
 
 /* ------------------------------------------------------------------ *
+ * The deck: home as one horizontal run of viewport-sized cards.
+ * Vertical scroll drives horizontal travel; snap stops keep one card
+ * in focus; the track zooms with scroll speed and settles at rest.
+ * ------------------------------------------------------------------ */
+.hdeck {
+  position: relative;
+}
+
+/* Invisible full-height snap stops, one per card. */
+.hdeck__step {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  height: 100vh;
+  scroll-snap-align: start;
+}
+
+.hdeck__viewport {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  /* The blend at the edges: neighbours dissolve into the ground. */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 7%,
+    black 93%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 7%,
+    black 93%,
+    transparent 100%
+  );
+}
+
+.hdeck__track {
+  display: flex;
+  align-items: stretch;
+  gap: 4vw;
+  padding-left: 15vw;
+  will-change: transform;
+}
+
+.hcard {
+  flex: none;
+  width: 70vw;
+  height: min(78vh, 860px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.2vw, 20px);
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  color: inherit;
+}
+
+.hcard--surface {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow);
+  padding: clamp(24px, 2.6vw, 48px) clamp(24px, 3vw, 56px);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.hcard--surface:hover {
+  border-color: var(--accent-line);
+}
+
+/* The pitch and the sign-off sit straight on the ground, no surface. */
+.hcard--pitch {
+  justify-content: center;
+  gap: clamp(16px, 1.6vw, 28px);
+  padding: 0 2vw;
+}
+
+.hpitch {
+  font-size: clamp(34px, 4.5vw, 76px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.hdeck__hint {
+  color: var(--numeral);
+}
+
+.hcard__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.go {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.go:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Below 760px the deck stacks vertically and scrolls natively. */
+.vdeck {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+}
+
+.vdeck .hcard {
+  width: auto;
+  height: auto;
+  min-height: 320px;
+}
+
+.vdeck .hcard--pitch {
+  min-height: 55vh;
+  padding: 24px 10px;
+}
+
+/* ------------------------------------------------------------------ *
  * Focus view: one case study (or lab log) per card, a deck you page
  * through with the arrows in the bar along the base.
  * ------------------------------------------------------------------ */
 .focusview {
-  position: absolute;
-  inset: 0;
-  z-index: 6;
+  /* The home page scrolls now, so a detail view floats fixed above it,
+     inset like a card rather than pinned to a grid container. */
+  position: fixed;
+  inset: clamp(10px, 1.4vw, 24px);
+  z-index: 60;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-xl);
@@ -612,7 +746,7 @@ a {
 }
 
 /* A lab log opened from the lab view has to enter above it. */
-.focusview--top { z-index: 8; }
+.focusview--top { z-index: 62; }
 
 .focus__main {
   flex: 1;
@@ -696,9 +830,9 @@ a {
  * Lab view: full-card grid of experiment boxes.
  * ------------------------------------------------------------------ */
 .labview {
-  position: absolute;
-  inset: 0;
-  z-index: 7;
+  position: fixed;
+  inset: clamp(10px, 1.4vw, 24px);
+  z-index: 61;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-xl);
@@ -795,19 +929,6 @@ a {
 
   .c-lisa { min-height: 260px; }
 
-  /* Overlays can no longer be absolutely pinned to a fixed-height card,
-     so they take over the screen instead. */
-  .focusview,
-  .labview {
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    overflow: auto;
-  }
-
   .labgrid { grid-template-columns: 1fr 1fr; }
 }
 
@@ -826,6 +947,16 @@ a {
       'cs3'
       'others'
       'lab';
+  }
+
+  /* Detail views take the whole screen on a phone. */
+  .focusview,
+  .labview {
+    inset: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: auto;
   }
 
   .focus__main { padding: 18px 16px 28px; }

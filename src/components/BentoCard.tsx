@@ -5,8 +5,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { cases, getCase } from '@/data/cases';
 import { lab } from '@/data/lab';
 import { springCrisp } from '@/lib/motion';
-import { BentoGrid } from './BentoGrid';
 import { CaseDetail } from './CaseDetail';
+import { HorizontalDeck } from './HorizontalDeck';
 import { LabEntryDetail } from './LabEntryDetail';
 import { LabGrid } from './LabGrid';
 import { Pager } from './Pager';
@@ -190,16 +190,14 @@ export function BentoCard({ initialView }: { initialView?: View }) {
   const transition = reduced ? { duration: 0 } : springCrisp;
 
   return (
-    <div className="shell">
-      <div className="frame">
-        <div className="frame__body">
-          <BentoGrid
-            onOpenCase={openCase}
-            onOpenLab={openLab}
-            onOpenStory={openStory}
-          />
+    <>
+      <HorizontalDeck
+        onOpenCase={openCase}
+        onOpenLab={openLab}
+        onOpenStory={openStory}
+      />
 
-          <AnimatePresence>
+      <AnimatePresence>
             {study ? (
               <motion.div
                 key={`case-${study.slug}`}
@@ -294,9 +292,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
                 />
               </motion.div>
             ) : null}
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
+      </AnimatePresence>
+    </>
   );
 }

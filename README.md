@@ -4,13 +4,14 @@ Personal portfolio site for Bharat Bharat, product designer in Amsterdam. Curren
 
 ## Concept
 
-A single bento card, everything scannable at a glance, minimal scrolling.
+A horizontal deck of viewport-sized cards. Super minimal, only necessary content.
 
-- Name, availability, what I'm doing now and contact live in their own bento tile — no floating bar above the card. Inside a case study, the story or a lab log, the same block sits at the foot of the map column.
-- The card leads with the pitch at display size, then the work band in strict priority order: case study 01 (flagship) → 02 → 03 → other case studies → lab.
-- Clicking a case study opens one case study per view with a mini map of all of them.
-- The lab is a full card grid of experiment boxes that expand in place.
-- Modular by design: each tile is one component fed by one data entry, so adding a case study is one entry.
+- The landing card is the pitch alone, 70% of the viewport on a transparent ground.
+- Vertical scroll drives horizontal travel through the deck in strict priority order: pitch → 01 (flagship) → 02 → 03 → other case studies → lab → contact.
+- Full-height snap stops keep exactly one card in focus; neighbours dim and dissolve at the edges.
+- The whole track zooms out in proportion to scroll speed and springs back when you stop.
+- Clicking a card opens the full case study (or lab log) as its own view, with left and right arrows and a position counter to page through the set.
+- Modular by design: each card is one component fed by one data entry, so adding a case study is one entry.
 
 ## Progress
 
