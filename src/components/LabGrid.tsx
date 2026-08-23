@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'motion/react';
 import Link from 'next/link';
 import { lab, labSlots } from '@/data/lab';
 import { Label, Placeholder } from './Primitives';
@@ -30,13 +31,14 @@ export function LabGrid({ onOpen }: { onOpen?: (slug: string) => void }) {
         );
 
         return onOpen ? (
-          <button
+          <motion.button
             key={entry.slug}
+            layoutId={`dim-lab-${entry.slug}`}
             className="labbox labbox--x"
             onClick={() => onOpen(entry.slug)}
           >
             {inner}
-          </button>
+          </motion.button>
         ) : (
           <Link
             key={entry.slug}

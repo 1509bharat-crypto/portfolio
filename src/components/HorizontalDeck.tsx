@@ -25,6 +25,8 @@ type DeckItem = {
   className?: string;
   ariaLabel?: string;
   onClick?: () => void;
+  /** Shared-element id: the card morphs into the dimension that carries it. */
+  layoutId?: string;
   body: ReactNode;
 };
 
@@ -91,6 +93,7 @@ function DeckCard({
       className={className}
       onClick={item.onClick}
       aria-label={item.ariaLabel}
+      layoutId={item.layoutId}
     >
       {item.body}
     </motion.button>
@@ -165,6 +168,7 @@ export function HorizontalDeck({
       key: study.slug,
       className: 'hcard--surface',
       ariaLabel: `Open case study: ${study.title}`,
+      layoutId: `dim-${study.slug}`,
       onClick: () => onOpenCase(study.slug),
       body: (
         <>
@@ -188,6 +192,7 @@ export function HorizontalDeck({
       key: 'others',
       className: 'hcard--surface',
       ariaLabel: 'Open other case studies',
+      layoutId: `dim-${otherCases[0].slug}`,
       onClick: () => onOpenCase(otherCases[0].slug),
       body: (
         <>
@@ -206,6 +211,7 @@ export function HorizontalDeck({
       key: 'lab',
       className: 'hcard--surface',
       ariaLabel: 'Open the lab',
+      layoutId: 'dim-lab',
       onClick: onOpenLab,
       body: (
         <>

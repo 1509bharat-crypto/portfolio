@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Pager } from '@/components/Pager';
+import Link from 'next/link';
 import { StoryDetail } from '@/components/StoryDetail';
 import { story } from '@/data/story';
 
@@ -10,15 +10,15 @@ export const metadata: Metadata = {
 
 export default function StoryPage() {
   return (
-    <div className="shell">
-      <div className="frame">
-        <div className="frame__body">
-          <div className="focusview">
-            <div className="focus__main">
-              <StoryDetail />
-            </div>
-            <Pager backHref="/" showArrows={false} />
-          </div>
+    <div className="dimpage">
+      <div className="dim__bar">
+        <Link className="wbtn dim__back" href="/">
+          ← Back
+        </Link>
+      </div>
+      <div className="dim__scroll">
+        <div className="dimbody">
+          <StoryDetail />
         </div>
       </div>
     </div>

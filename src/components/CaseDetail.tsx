@@ -1,101 +1,87 @@
-'use client';
-
-import { motion } from 'motion/react';
+import Link from 'next/link';
 import type { CaseStudy } from '@/lib/types';
-import { easeOut } from '@/lib/motion';
 import { BarLines, Placeholder } from './Primitives';
 
 /**
- * The body of one case study. Shared by the overlay on the home card and the
- * standalone /work/[slug] page, so both stay in sync from one definition.
+ * The body of one case study, laid out editorially inside its dimension:
+ * a hero that owns the golden share of the first viewport, then one row per
+ * section with the title in the narrow column and the content in the wide
+ * one (1 : 1.618). Content is capped by the data, not the layout; keep it
+ * to roughly two viewports.
  *
- * `morph` opts the title into the shared-element transition: the same layoutId
- * sits on the grid tile, so clicking a tile flies its title into this heading
- * rather than cross-fading two separate pieces of text.
+ * Shared by the overlay dimension on the home deck and the standalone
+ * /work/[slug] page. Pass `onNext` from the overlay, `nextHref` from the
+ * page; both render the same footer link.
  */
 export function CaseDetail({
   study,
-  morph = false,
+  onNext,
+  nextHref,
+  nextTitle,
 }: {
   study: CaseStudy;
-  morph?: boolean;
+  onNext?: () => void;
+  nextHref?: string;
+  nextTitle?: string;
 }) {
-  const stagger = {
-    hidden: { opacity: 0, y: 6 },
-    show: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { delay: 0.05 + i * 0.04, duration: 0.32, ease: easeOut },
-    }),
-  };
-
   return (
-    <>
-      <motion.span className="lab" custom={0} variants={stagger} initial="hidden" animate="show">
-        {study.kicker}
-      </motion.span>
+    <article className="dimbody">
+      <header className="dim__hero">
+        <span className="lab">{study.kicker}</span>
+        <h1 className="dim__title">{study.headline}</h1>
+        {study.stats?.length ? (
+          <div className="stats">
+            {study.stats.map((s) => (
+              <div className="stat" key={s.label}>
+                <b>{s.value}</b>
+                <span>{s.label}</span>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </header>
 
-      {morph ? (
-        <motion.h1 layoutId={`case-title-${study.slug}`}>{study.title}</motion.h1>
-      ) : (
-        <h1>{study.title}</h1>
-      )}
-
-      <motion.p
-        className="lisa-sub"
-        custom={1}
-        variants={stagger}
-        initial="hidden"
-        animate="show"
-      >
-        {study.summary}
-      </motion.p>
-
-      {study.stats?.length ? (
-        <motion.div
-          className="stats"
-          custom={2}
-          variants={stagger}
-          initial="hidden"
-          animate="show"
-        >
-          {study.stats.map((s) => (
-            <div className="stat" key={s.label}>
-              <b>{s.value}</b>
-              <span>{s.label}</span>
-            </div>
-          ))}
-        </motion.div>
-      ) : null}
-
-      <div className="dgrid">
+      <div className="dim__rows">
         {study.blocks.map((b, i) => (
-          <motion.div
-            className="dblock"
-            key={`${b.title}-${i}`}
-            custom={3 + i}
-            variants={stagger}
-            initial="hidden"
-            animate="show"
-          >
-            <b>{b.title}</b>
-            {b.body ? <p className="storyline">{b.body}</p> : <BarLines />}
-          </motion.div>
+          <section className="dim__row" key={`${b.title}-${i}`}>
+            <h2 className="dim__h2">{b.title}</h2>
+            <div className="dim__content">
+              {b.body ? (
+                <p className="dim__p">{b.body}</p>
+              ) : (
+                <BarLines widths={[92, 68, 45]} />
+              )}
+              {i % 2 === 0 ? <Placeholder className="dim__ph" /> : null}
+            </div>
+          </section>
         ))}
       </div>
 
-      {study.stack?.length ? (
-        <div className="meta">
-          {study.stack.map((t, i) => (
-            <span key={t}>
-              {t}
-              {i < study.stack!.length - 1 ? <span aria-hidden> ·</span> : null}
-            </span>
-          ))}
-        </div>
-      ) : null}
+      <Placeholder className="dim__wide" />
 
-      <Placeholder className="min-h-[110px] flex-1" />
-    </>
+      <footer className="dim__foot">
+        {study.stack?.length ? (
+          <div className="meta">
+            {study.stack.map((t, i) => (
+              <span key={t}>
+                {t}
+                {i < study.stack!.length - 1 ? <span aria-hidden> ·</span> : null}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <span />
+        )}
+        {nextTitle && onNext ? (
+          <button className="go" onClick={onNext}>
+            Next · {nextTitle} →
+          </button>
+        ) : nextTitle && nextHref ? (
+          <Link className="go" href={nextHref}>
+            Next · {nextTitle} →
+          </Link>
+        ) : null}
+      </footer>
+    </article>
   );
 }

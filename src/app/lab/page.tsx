@@ -10,21 +10,19 @@ export const metadata: Metadata = {
 
 export default function LabPage() {
   return (
-    <div className="shell">
-      <div className="frame">
-        <div className="frame__body">
-          <div className="labview">
-            <div className="labview__head">
-              <div>
-                <span className="lab">Lab · open questions</span>
-                <h1>Experiments</h1>
-              </div>
-              <Link className="wbtn" href="/">
-                ⌗ Back to grid
-              </Link>
-            </div>
-            <LabGrid />
-          </div>
+    <div className="dimpage">
+      <div className="dim__bar">
+        <Link className="wbtn dim__back" href="/">
+          ← Back
+        </Link>
+      </div>
+      <div className="dim__scroll">
+        <div className="dimbody">
+          <header className="dim__hero dim__hero--short">
+            <span className="lab">Lab · open questions</span>
+            <h1 className="dim__title">Experiments</h1>
+          </header>
+          <LabGrid />
         </div>
       </div>
     </div>

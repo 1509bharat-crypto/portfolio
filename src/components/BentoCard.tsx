@@ -9,7 +9,6 @@ import { CaseDetail } from './CaseDetail';
 import { HorizontalDeck } from './HorizontalDeck';
 import { LabEntryDetail } from './LabEntryDetail';
 import { LabGrid } from './LabGrid';
-import { Pager } from './Pager';
 import { StoryDetail } from './StoryDetail';
 
 type View =
@@ -20,7 +19,6 @@ type View =
   | { kind: 'story' };
 
 const getLabEntry = (slug: string) => lab.find((e) => e.slug === slug);
-const pad = (n: number) => String(n).padStart(2, '0');
 
 function viewFromPath(path: string): View {
   if (path.startsWith('/work/')) {
@@ -37,25 +35,29 @@ function viewFromPath(path: string): View {
 }
 
 /**
- * The whole experience lives inside one card: case studies and the lab open as
- * overlays rather than navigations, which is what keeps the "everything at a
- * glance, minimal scrolling" concept intact.
+ * Home is the deck; each card is a dimension. Clicking a card morphs it into
+ * a full page (shared layoutId): the card's surface becomes the page's
+ * background, a lone back button sits on top, and closing morphs it back into
+ * its slot on the shelf.
  *
- * Detail views are a deck: one case study (or lab log) per viewport, left and
- * right arrows plus a position counter to move through the set. Arrow keys
- * work too.
+ * Stepping to the next project swaps the content inside the open dimension;
+ * the dimension itself keeps the identity of the card it grew from, so Back
+ * always returns to where you entered.
  *
- * The URL is kept in step with `history.pushState`, so a case study is still
- * shareable and the back button still works; a cold load of /work/<slug> is
- * served by the real route instead.
+ * The URL is kept in step with `history.pushState`; a cold load of
+ * /work/<slug> is served by the real route instead.
  */
 export function BentoCard({ initialView }: { initialView?: View }) {
   const [view, setView] = useState<View>(initialView ?? { kind: 'grid' });
   const reduced = useReducedMotion();
   const overlayRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const lastFocused = useRef<HTMLElement | null>(null);
-  /** -1 stepping back, 1 stepping forward, 0 opening from the grid. */
+  /** -1 stepping back, 1 stepping forward, 0 opening fresh. */
   const [dir, setDir] = useState(0);
+  /** The card each open dimension grew out of, for the morph home. */
+  const [caseOrigin, setCaseOrigin] = useState<string | null>(null);
+  const [labOrigin, setLabOrigin] = useState<string | null>(null);
 
   const go = useCallback((next: View, path: string) => {
     if (typeof window !== 'undefined' && window.location.pathname !== path) {
@@ -67,6 +69,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
   const openCase = useCallback(
     (slug: string) => {
       setDir(0);
+      setCaseOrigin(slug);
       lastFocused.current = document.activeElement as HTMLElement;
       go({ kind: 'case', slug }, `/work/${slug}`);
     },
@@ -82,6 +85,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
   const openLabEntry = useCallback(
     (slug: string) => {
       setDir(0);
+      setLabOrigin(slug);
       go({ kind: 'labEntry', slug }, `/lab/${slug}`);
     },
     [go],
@@ -95,26 +99,28 @@ export function BentoCard({ initialView }: { initialView?: View }) {
 
   const close = useCallback(() => {
     setDir(0);
+    setCaseOrigin(null);
+    setLabOrigin(null);
     go({ kind: 'grid' }, '/');
     lastFocused.current?.focus?.();
   }, [go]);
 
-  // Current position in each deck, when a deck view is open.
+  // Current position in each set, when a dimension is open.
   const study = view.kind === 'case' ? getCase(view.slug) : undefined;
   const caseIndex = study ? cases.findIndex((c) => c.slug === study.slug) : -1;
-  const prevCase = caseIndex > 0 ? cases[caseIndex - 1] : undefined;
   const nextCase =
     caseIndex >= 0 && caseIndex < cases.length - 1
       ? cases[caseIndex + 1]
       : undefined;
+  const prevCase = caseIndex > 0 ? cases[caseIndex - 1] : undefined;
 
   const labEntry = view.kind === 'labEntry' ? getLabEntry(view.slug) : undefined;
   const labIndex = labEntry
     ? lab.findIndex((e) => e.slug === labEntry.slug)
     : -1;
-  const prevLab = labIndex > 0 ? lab[labIndex - 1] : undefined;
   const nextLab =
     labIndex >= 0 && labIndex < lab.length - 1 ? lab[labIndex + 1] : undefined;
+  const prevLab = labIndex > 0 ? lab[labIndex - 1] : undefined;
 
   const stepCase = (delta: -1 | 1) => {
     const target = delta === -1 ? prevCase : nextCase;
@@ -137,7 +143,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  // Escape climbs one level; arrow keys page through the open deck.
+  // Escape climbs one level; arrow keys step within the open set.
   useEffect(() => {
     if (view.kind === 'grid') return;
     const onKey = (e: KeyboardEvent) => {
@@ -159,7 +165,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
     return () => document.removeEventListener('keydown', onKey);
   });
 
-  // The overlay covers the screen below 1100px; stop the page scrolling behind it.
+  // The deck must not scroll behind an open dimension.
   useEffect(() => {
     if (view.kind === 'grid') return;
     const prev = document.body.style.overflow;
@@ -171,23 +177,31 @@ export function BentoCard({ initialView }: { initialView?: View }) {
 
   useEffect(() => {
     if (view.kind !== 'grid') overlayRef.current?.focus();
-  }, [view]);
+  }, [view.kind]);
 
-  const panel = reduced
-    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
-    : dir
-      ? {
-          initial: { opacity: 0, x: dir * 44 },
-          animate: { opacity: 1, x: 0 },
-          exit: { opacity: 0, x: dir * -32 },
-        }
-      : {
-          initial: { opacity: 0, y: 10, scale: 0.99 },
-          animate: { opacity: 1, y: 0, scale: 1 },
-          exit: { opacity: 0, y: 6, scale: 0.995 },
-        };
+  // Fresh content starts at its top when stepping between projects.
+  const contentKey =
+    view.kind === 'case' || view.kind === 'labEntry' ? view.slug : view.kind;
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 });
+  }, [contentKey]);
 
   const transition = reduced ? { duration: 0 } : springCrisp;
+
+  const swap = reduced
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 } }
+    : {
+        initial: { opacity: 0, x: dir * 40, y: dir === 0 ? 8 : 0 },
+        animate: { opacity: 1, x: 0, y: 0 },
+      };
+
+  const fade = reduced
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
+    : {
+        initial: { opacity: 0, y: 10, scale: 0.99 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        exit: { opacity: 0, y: 6, scale: 0.995 },
+      };
 
   return (
     <>
@@ -198,100 +212,117 @@ export function BentoCard({ initialView }: { initialView?: View }) {
       />
 
       <AnimatePresence>
-            {study ? (
-              <motion.div
-                key={`case-${study.slug}`}
-                ref={overlayRef}
-                tabIndex={-1}
-                role="dialog"
-                aria-modal="true"
-                aria-label={`Case study: ${study.title}`}
-                className="focusview"
-                transition={transition}
-                {...panel}
-              >
-                <div className="focus__main">
-                  <CaseDetail study={study} morph={dir === 0} />
-                </div>
-                <Pager
-                  position={`${study.number} / ${pad(cases.length)}`}
-                  label={study.title}
-                  onBack={close}
-                  onPrev={prevCase ? () => stepCase(-1) : undefined}
+        {study ? (
+          <motion.div
+            key="case-dim"
+            layoutId={`dim-${caseOrigin ?? study.slug}`}
+            ref={overlayRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Case study: ${study.title}`}
+            className="dim"
+            transition={transition}
+          >
+            <div className="dim__bar">
+              <button className="wbtn dim__back" onClick={close}>
+                ← Back
+              </button>
+            </div>
+            <div className="dim__scroll" ref={scrollRef}>
+              <motion.div key={study.slug} {...swap} transition={transition}>
+                <CaseDetail
+                  study={study}
                   onNext={nextCase ? () => stepCase(1) : undefined}
+                  nextTitle={nextCase?.title}
                 />
               </motion.div>
-            ) : null}
+            </div>
+          </motion.div>
+        ) : null}
 
-            {view.kind === 'story' ? (
-              <motion.div
-                key="story"
-                ref={overlayRef}
-                tabIndex={-1}
-                role="dialog"
-                aria-modal="true"
-                aria-label="The story"
-                className="focusview"
-                transition={transition}
-                {...panel}
-              >
-                <div className="focus__main">
-                  <StoryDetail />
-                </div>
-                <Pager onBack={close} showArrows={false} />
-              </motion.div>
-            ) : null}
-
-            {view.kind === 'lab' ? (
-              <motion.div
-                key="lab"
-                ref={overlayRef}
-                tabIndex={-1}
-                role="dialog"
-                aria-modal="true"
-                aria-label="Lab"
-                className="labview"
-                transition={transition}
-                {...panel}
-              >
-                <div className="labview__head">
-                  <div>
-                    <span className="lab">Lab · open questions</span>
-                    <h1>Experiments</h1>
-                  </div>
-                  <button className="wbtn" onClick={close}>
-                    ⌗ Back to grid
-                  </button>
-                </div>
+        {view.kind === 'lab' ? (
+          <motion.div
+            key="lab-dim"
+            layoutId="dim-lab"
+            ref={overlayRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Lab"
+            className="dim"
+            transition={transition}
+          >
+            <div className="dim__bar">
+              <button className="wbtn dim__back" onClick={close}>
+                ← Back
+              </button>
+            </div>
+            <div className="dim__scroll">
+              <div className="dimbody">
+                <header className="dim__hero dim__hero--short">
+                  <span className="lab">Lab · open questions</span>
+                  <h1 className="dim__title">Experiments</h1>
+                </header>
                 <LabGrid onOpen={openLabEntry} />
-              </motion.div>
-            ) : null}
+              </div>
+            </div>
+          </motion.div>
+        ) : null}
 
-            {labEntry ? (
-              <motion.div
-                key={`lab-${labEntry.slug}`}
-                ref={overlayRef}
-                tabIndex={-1}
-                role="dialog"
-                aria-modal="true"
-                aria-label={`Lab: ${labEntry.title}`}
-                className="focusview focusview--top"
-                transition={transition}
-                {...panel}
-              >
-                <div className="focus__main">
-                  <LabEntryDetail entry={labEntry} />
-                </div>
-                <Pager
-                  position={`${pad(labIndex + 1)} / ${pad(lab.length)}`}
-                  label={labEntry.title}
-                  backLabel="⌗ Back to the lab"
-                  onBack={openLab}
-                  onPrev={prevLab ? () => stepLab(-1) : undefined}
+        {labEntry ? (
+          <motion.div
+            key="labentry-dim"
+            layoutId={`dim-lab-${labOrigin ?? labEntry.slug}`}
+            ref={overlayRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Lab: ${labEntry.title}`}
+            className="dim dim--top"
+            transition={transition}
+          >
+            <div className="dim__bar">
+              <button className="wbtn dim__back" onClick={openLab}>
+                ← Lab
+              </button>
+            </div>
+            <div className="dim__scroll" ref={scrollRef}>
+              <motion.div key={labEntry.slug} {...swap} transition={transition}>
+                <LabEntryDetail
+                  entry={labEntry}
                   onNext={nextLab ? () => stepLab(1) : undefined}
+                  nextTitle={nextLab?.title}
                 />
               </motion.div>
-            ) : null}
+            </div>
+          </motion.div>
+        ) : null}
+
+        {view.kind === 'story' ? (
+          <motion.div
+            key="story-dim"
+            ref={overlayRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-label="The story"
+            className="dim"
+            transition={transition}
+            {...fade}
+          >
+            <div className="dim__bar">
+              <button className="wbtn dim__back" onClick={close}>
+                ← Back
+              </button>
+            </div>
+            <div className="dim__scroll">
+              <div className="dimbody">
+                <StoryDetail />
+              </div>
+            </div>
+          </motion.div>
+        ) : null}
       </AnimatePresence>
     </>
   );
