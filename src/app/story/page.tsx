@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { CaseMap } from '@/components/CaseMap';
+import { Pager } from '@/components/Pager';
 import { StoryDetail } from '@/components/StoryDetail';
 import { story } from '@/data/story';
 
@@ -17,7 +17,7 @@ export default function StoryPage() {
             <div className="focus__main">
               <StoryDetail />
             </div>
-            <CaseMap />
+            <Pager backHref="/" showArrows={false} />
           </div>
         </div>
       </div>

@@ -28,16 +28,3 @@ export function Availability() {
   );
 }
 
-/**
- * Compact identity for the map column, so name and contact stay reachable
- * inside a case study, the story or a lab log now that the top bar is gone.
- */
-export function IdentityBlock() {
-  return (
-    <div className="map__id">
-      <span className="me__name">{profile.name}</span>
-      <Availability />
-      <IdentityLinks compact />
-    </div>
-  );
-}

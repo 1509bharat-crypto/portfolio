@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CaseDetail } from '@/components/CaseDetail';
-import { CaseMap } from '@/components/CaseMap';
+import { Pager } from '@/components/Pager';
 import { cases, getCase } from '@/data/cases';
 
 type Props = { params: Promise<{ slug: string }> };
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: study.title,
     description: study.summary,
-    // Slots aren't written yet — keep them out of search results.
+    // Slots aren't written yet, so keep them out of search results.
     robots: study.slot ? { index: false, follow: true } : undefined,
     openGraph: { title: study.title, description: study.summary },
   };
@@ -34,6 +34,10 @@ export default async function CasePage({ params }: Props) {
   const study = getCase(slug);
   if (!study) notFound();
 
+  const index = cases.findIndex((c) => c.slug === study.slug);
+  const prev = index > 0 ? cases[index - 1] : null;
+  const next = index < cases.length - 1 ? cases[index + 1] : null;
+
   return (
     <div className="shell">
       <div className="frame">
@@ -42,7 +46,13 @@ export default async function CasePage({ params }: Props) {
             <div className="focus__main">
               <CaseDetail study={study} />
             </div>
-            <CaseMap activeSlug={study.slug} />
+            <Pager
+              position={`${study.number} / ${String(cases.length).padStart(2, '0')}`}
+              label={study.title}
+              backHref="/"
+              prevHref={prev ? `/work/${prev.slug}` : null}
+              nextHref={next ? `/work/${next.slug}` : null}
+            />
           </div>
         </div>
       </div>

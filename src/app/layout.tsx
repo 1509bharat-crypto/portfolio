@@ -20,19 +20,19 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://bharatbharat.co'),
   title: {
-    default: `${profile.name} — ${profile.role}, ${profile.location}`,
-    template: `%s — ${profile.name}`,
+    default: `${profile.name} · ${profile.role}, ${profile.location}`,
+    template: `%s · ${profile.name}`,
   },
   description: profile.pitch,
   openGraph: {
     type: 'website',
     siteName: profile.name,
-    title: `${profile.name} — ${profile.role}, ${profile.location}`,
+    title: `${profile.name} · ${profile.role}, ${profile.location}`,
     description: profile.pitch,
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${profile.name} — ${profile.role}, ${profile.location}`,
+    title: `${profile.name} · ${profile.role}, ${profile.location}`,
     description: profile.pitch,
   },
 };

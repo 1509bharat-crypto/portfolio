@@ -228,21 +228,6 @@ a {
   font-size: var(--t-xs);
 }
 
-/* Identity at the foot of the map column, so name and contact stay reachable
-   inside a case study now that there is no bar above the card. */
-.map__id {
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px dashed var(--line);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.map__id .me__name {
-  font-size: var(--t-md);
-}
-
 /* ---------- wireframe primitives ---------- */
 .lab {
   font-family: var(--font-plex-mono), monospace;
@@ -403,11 +388,15 @@ a {
   display: grid;
   gap: clamp(10px, 0.75vw, 16px);
   padding: 0;
-  grid-template-columns: 1.05fr 1.05fr 1fr 1fr;
+  /* Golden ratio tracks. Columns: the work zone (cols 1+2) to the side zone
+     (cols 3+4) is phi to 1, the classic 61.8/38.2 split. Rows: successive
+     powers of phi (0.618, 1, 1.618), so every adjacent pair of rows is itself
+     in golden ratio. The work band lands at exactly half the card height. */
+  grid-template-columns: 1.618fr 1.618fr 1fr 1fr;
   /* minmax(0, …) rather than a bare fr: an fr track's implicit minimum is
      auto, so a tall tile can push the grid past the card's height and make
      the page scroll by a few pixels. */
-  grid-template-rows: minmax(0, 0.95fr) minmax(0, 1.1fr) minmax(0, 0.7fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1.618fr) minmax(0, 0.618fr);
   grid-template-areas:
     'id    id    id     me'
     'lisa  lisa  robin  cs3'
@@ -605,7 +594,8 @@ a {
 }
 
 /* ------------------------------------------------------------------ *
- * Focus view: one case study per card, with a map of all of them.
+ * Focus view: one case study (or lab log) per card, a deck you page
+ * through with the arrows in the bar along the base.
  * ------------------------------------------------------------------ */
 .focusview {
   position: absolute;
@@ -616,13 +606,19 @@ a {
   border-radius: var(--r-xl);
   box-shadow: var(--shadow);
   overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr 216px;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
 }
 
+/* A lab log opened from the lab view has to enter above it. */
+.focusview--top { z-index: 8; }
+
 .focus__main {
-  padding: 22px 24px;
+  flex: 1;
+  /* Padding scales with the card's large corner radius so content never
+     collides with the curve. */
+  padding: clamp(24px, 2.6vw, 48px) clamp(24px, 3vw, 56px);
   overflow: auto;
   display: flex;
   flex-direction: column;
@@ -637,54 +633,63 @@ a {
   line-height: 1.14;
 }
 
-.map {
-  border-left: 1px solid var(--line);
-  padding: 14px 12px;
+/* The bar along the base of a detail view: back, position, contact, arrows. */
+.pager {
+  border-top: 1px solid var(--line);
+  padding: 12px clamp(20px, 2.6vw, 44px);
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  overflow: auto;
-  min-height: 0;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.map__lab {
-  font-family: var(--font-plex-mono), monospace;
-  font-size: var(--t-label);
-  letter-spacing: var(--t-track);
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 6px 2px 2px;
-}
-
-.mapitem {
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  padding: 8px 11px;
-  font-size: var(--t-sm);
-  font-weight: 500;
-  color: var(--muted);
-  width: 100%;
-  display: block;
-  transition: border-color 0.16s, background 0.16s, color 0.16s;
-}
-
-.mapitem:hover {
-  color: var(--ink);
-  border-color: var(--line-strong);
-}
-
-.mapitem[aria-current='true'] {
-  border-color: var(--accent-line);
-  background: var(--accent-soft);
-  color: var(--ink);
-  font-weight: 600;
-}
-
-.mapitem--back {
+.pager__back {
   border-style: dashed;
   color: var(--accent);
   border-color: var(--accent-line);
-  margin-bottom: 4px;
+}
+
+.pager__pos {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.pager__label {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pager__nav {
+  display: flex;
+  gap: 6px;
+}
+
+.pager__arrow {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  color: var(--ink);
+  transition: background 0.16s, border-color 0.16s, opacity 0.16s;
+}
+
+.pager__arrow:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+
+.pager__arrow:disabled {
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 /* ------------------------------------------------------------------ *
@@ -746,50 +751,15 @@ a {
 .labbox--slot { border-style: dashed; }
 .labbox--slot .lab { color: var(--numeral); }
 
+/* A box is one click: it opens that experiment's log as its own view. */
 .labbox--x {
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
   transition: border-color 0.15s, background 0.15s;
 }
 
 .labbox--x:hover { border-color: var(--accent-line); }
-
-/* The toggle fills the box's resting area so the whole card reads as the
-   target, while the expanded panel's link stays outside the button. */
-.labbox__toggle {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-  min-height: 0;
-  cursor: pointer;
-}
-
-.labbox--x[data-expanded='true'] {
-  grid-column: span 2;
-  grid-row: span 2;
-  border-color: var(--accent-line);
-  background: var(--accent-soft);
-}
-
-.labmore__link {
-  font-size: var(--t-sm);
-  font-weight: 600;
-  color: var(--accent);
-  align-self: flex-start;
-}
-
-.labmore__link:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.labmore {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  border-top: 1px dashed var(--line);
-  padding-top: 8px;
-  overflow: hidden;
-}
 
 /* ------------------------------------------------------------------ *
  * Responsive.
@@ -838,23 +808,6 @@ a {
     overflow: auto;
   }
 
-  .focusview {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-  }
-
-  .map {
-    border-left: none;
-    border-bottom: 1px solid var(--line);
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    overflow: visible;
-  }
-
-  .map__lab { width: 100%; }
-  .mapitem { width: auto; }
-
   .labgrid { grid-template-columns: 1fr 1fr; }
 }
 
@@ -883,11 +836,10 @@ a {
     padding: 0 16px 20px;
   }
 
-  /* Expanding in place has no meaning in a single column. */
-  .labbox--x[data-expanded='true'] {
-    grid-column: span 1;
-    grid-row: span 1;
-  }
+  /* On a phone the pager keeps back, position and arrows; contact stays one
+     step away on the grid. */
+  .pager { padding: 10px 14px; }
+  .pager .me__links { display: none; }
 
   .dgrid { grid-template-columns: 1fr; }
 }
@@ -900,14 +852,11 @@ a {
  * that genuinely cannot interpolate — column counts — get a breakpoint.
  * ------------------------------------------------------------------ */
 @media (min-width: 1600px) {
-  .focusview { grid-template-columns: 1fr 260px; }
-  .focus__main { padding: 30px 34px; }
   /* Three columns of experiment box get uncomfortably wide past this point. */
   .labgrid { grid-template-columns: repeat(4, 1fr); }
 }
 
 @media (min-width: 2200px) {
-  .focusview { grid-template-columns: 1fr 300px; }
   .labgrid { grid-template-columns: repeat(5, 1fr); }
 }
 
@@ -921,8 +870,7 @@ a {
   .dblock,
   .ph,
   .wbtn,
-  .mapitem,
-  .labbox__toggle {
+  .pager__arrow {
     corner-shape: squircle;
   }
 }
