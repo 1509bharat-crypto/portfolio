@@ -32,12 +32,20 @@ export type CaseStudy = {
   kicker: string;
   title: string;
   /**
-   * Optional suffix on the grid label, for a fact the layout can't convey on
-   * its own — "current", a year. Rank is NOT a tag: the flagship tile is four
-   * times the size of the others, so calling it the flagship is the typography
-   * explaining itself. Slots say nothing; the placeholder already shows it.
+   * The name a recruiter would recognise — the company or the shipped product,
+   * not an internal codename. Half of the grid label.
    */
-  tag?: string;
+  company: string;
+  /**
+   * What the work demonstrates, in the reader's language rather than the
+   * project's. The first entry is the other half of the grid label, which
+   * reads COMPANY · VALUE — a recruiter has never heard of Lisa or Mona, but
+   * knows what voice UX is. Three is the practical ceiling — past that the
+   * label wraps to three lines and stops being scannable. Draw from
+   * `profile.disciplines` where the same skill applies, so the vocabulary of
+   * the site stays consistent.
+   */
+  skills: string[];
   /**
    * The one line the grid tile carries. Conversational, and it should land the
    * arc — what the situation was, and what changed — so the tile needs no

@@ -10,23 +10,25 @@ import { IdentityTile } from './IdentityTile';
 import { Chips, Label, Placeholder } from './Primitives';
 
 /**
- * The label row: the project name, which morphs into the detail heading, plus
- * where the study sits in the order. Defined at module scope — a component
- * created during render remounts every time, which would break the morph.
+ * The label row carries the skills, not the project name. A recruiter has
+ * never heard of Lisa or Mona; they have heard of voice UX. The name is the
+ * identifier and lives in the detail view and the map column, where it is
+ * being navigated by rather than scanned.
+ *
+ * Module scope on purpose — a component created during render remounts every
+ * time, which would break the shared-element transition.
  */
 function Head({ study }: { study: CaseStudy }) {
   return (
     <div className="cellhead">
       <span className="lab">
-        <motion.span layoutId={`case-title-${study.slug}`} className="lab__name">
-          {study.title}
-        </motion.span>
-        {study.tag ? (
-          <>
+        <span className="lab__name">{study.company}</span>
+        {study.skills.map((skill) => (
+          <span key={skill}>
             <span aria-hidden> · </span>
-            {study.tag}
-          </>
-        ) : null}
+            {skill}
+          </span>
+        ))}
       </span>
       <span className="csnum">{study.number}</span>
     </div>
@@ -95,7 +97,12 @@ export function BentoGrid({
         aria-label={`Open case study: ${flagship.title}`}
       >
         <Head study={flagship} />
-        <p className="headline headline--lead">{flagship.headline}</p>
+        <motion.p
+          className="headline headline--lead"
+          layoutId={`case-headline-${flagship.slug}`}
+        >
+          {flagship.headline}
+        </motion.p>
         {flagship.stats?.length ? (
           <div className="stats">
             {flagship.stats.map((s) => (
@@ -122,7 +129,9 @@ export function BentoGrid({
           aria-label={`Open case study: ${study.title}`}
         >
           <Head study={study} />
-          <p className="headline">{study.headline}</p>
+          <motion.p className="headline" layoutId={`case-headline-${study.slug}`}>
+            {study.headline}
+          </motion.p>
           <Placeholder className="flex-1" />
         </motion.button>
       ))}

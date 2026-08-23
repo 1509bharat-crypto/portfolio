@@ -353,9 +353,10 @@ a {
 
 .cellhead {
   display: flex;
-  align-items: center;
+  /* The skills label wraps on narrow tiles; the numeral stays on its first line. */
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
 }
 
 .storyline {
@@ -444,7 +445,15 @@ a {
   transform: translateY(0);
 }
 
-.c-id { grid-area: id; }
+/* The pitch is the site speaking, not a card of content. No fill and no
+   hairline, so it reads as the page's voice while the work below reads as
+   objects. Padding stays: it keeps the pitch's text aligned with the text in
+   the tiles underneath. */
+.c-id {
+  grid-area: id;
+  background: transparent;
+  border-color: transparent;
+}
 .c-lisa { grid-area: lisa; }
 .c-robin { grid-area: robin; }
 .c-cs3 { grid-area: cs3; }
