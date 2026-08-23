@@ -14,15 +14,19 @@ import { Chips, Label, Placeholder } from './Primitives';
  * where the study sits in the order. Defined at module scope — a component
  * created during render remounts every time, which would break the morph.
  */
-function Head({ study, rank }: { study: CaseStudy; rank: string }) {
+function Head({ study }: { study: CaseStudy }) {
   return (
     <div className="cellhead">
       <span className="lab">
         <motion.span layoutId={`case-title-${study.slug}`} className="lab__name">
           {study.title}
         </motion.span>
-        <span aria-hidden> · </span>
-        {rank}
+        {study.tag ? (
+          <>
+            <span aria-hidden> · </span>
+            {study.tag}
+          </>
+        ) : null}
       </span>
       <span className="csnum">{study.number}</span>
     </div>
@@ -68,7 +72,6 @@ export function BentoGrid({
     <motion.div className="bento" variants={container} initial="hidden" animate="show">
       {/* The pitch, at display size. */}
       <motion.section className="cell c-id" variants={cell}>
-        <Label>The pitch</Label>
         <p className="claim">{profile.pitch}</p>
         <Chips items={profile.disciplines} />
         <p className="idstory">
@@ -91,7 +94,7 @@ export function BentoGrid({
         onClick={() => onOpenCase(flagship.slug)}
         aria-label={`Open case study: ${flagship.title}`}
       >
-        <Head study={flagship} rank="flagship" />
+        <Head study={flagship} />
         <p className="headline headline--lead">{flagship.headline}</p>
         {flagship.stats?.length ? (
           <div className="stats">
@@ -108,9 +111,9 @@ export function BentoGrid({
 
       {/* 02 and 03. */}
       {[
-        { study: second, cls: 'c-robin', rank: 'current' },
-        { study: third, cls: 'c-cs3', rank: 'slot' },
-      ].map(({ study, cls, rank }) => (
+        { study: second, cls: 'c-robin' },
+        { study: third, cls: 'c-cs3' },
+      ].map(({ study, cls }) => (
         <motion.button
           key={study.slug}
           className={`cell cell--click ${cls}`}
@@ -118,7 +121,7 @@ export function BentoGrid({
           onClick={() => onOpenCase(study.slug)}
           aria-label={`Open case study: ${study.title}`}
         >
-          <Head study={study} rank={rank} />
+          <Head study={study} />
           <p className="headline">{study.headline}</p>
           <Placeholder className="flex-1" />
         </motion.button>

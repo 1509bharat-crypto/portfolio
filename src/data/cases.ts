@@ -36,6 +36,7 @@ export const cases: CaseStudy[] = [
     rank: 'primary',
     kicker: 'Case study · current · Robin, Utrecht',
     title: 'Robin',
+    tag: 'current',
     headline: 'Blue-collar recruiting, rebuilt around AI workflows.',
     tagline: 'Recruiting workflows, redesigned around AI.',
     summary:

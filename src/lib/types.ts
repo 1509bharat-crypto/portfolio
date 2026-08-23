@@ -32,6 +32,13 @@ export type CaseStudy = {
   kicker: string;
   title: string;
   /**
+   * Optional suffix on the grid label, for a fact the layout can't convey on
+   * its own — "current", a year. Rank is NOT a tag: the flagship tile is four
+   * times the size of the others, so calling it the flagship is the typography
+   * explaining itself. Slots say nothing; the placeholder already shows it.
+   */
+  tag?: string;
+  /**
    * The one line the grid tile carries. Conversational, and it should land the
    * arc — what the situation was, and what changed — so the tile needs no
    * supporting prose beneath it. Keep it under about fifteen words.

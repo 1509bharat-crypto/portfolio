@@ -1,6 +1,5 @@
 import { profile } from '@/data/profile';
 import { Availability, IdentityLinks } from './Identity';
-import { CellHead } from './Primitives';
 
 /**
  * The old floating top bar, folded into the grid. Name, availability, what
@@ -10,8 +9,6 @@ import { CellHead } from './Primitives';
 export function IdentityTile() {
   return (
     <>
-      <CellHead label="Who / now / contact" />
-
       <span className="me__name">
         <span className="mono me__mark" aria-hidden>
           ⌗
