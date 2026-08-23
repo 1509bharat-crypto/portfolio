@@ -165,18 +165,32 @@ export function BentoCard({ initialView }: { initialView?: View }) {
     return () => document.removeEventListener('keydown', onKey);
   });
 
-  // The deck must not scroll behind an open dimension.
+  // The deck must not scroll behind an open dimension, but its scroll
+  // position has to survive the trip: the morph back home aims at the card's
+  // on-shelf position, and `overflow: hidden` on the body would silently
+  // reset scroll to 0 and strand it. So block the input instead of collapsing
+  // the scroller; the dimension's own pane opts out via its ref.
   useEffect(() => {
     if (view.kind === 'grid') return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    const block = (e: Event) => {
+      if (overlayRef.current?.contains(e.target as Node)) return;
+      e.preventDefault();
+    };
+    window.addEventListener('wheel', block, { passive: false });
+    window.addEventListener('touchmove', block, { passive: false });
     return () => {
-      document.body.style.overflow = prev;
+      window.removeEventListener('wheel', block);
+      window.removeEventListener('touchmove', block);
     };
   }, [view.kind]);
 
+  // Focus the dimension's scroll pane so keyboard scrolling stays inside it
+  // instead of reaching the deck behind.
   useEffect(() => {
-    if (view.kind !== 'grid') overlayRef.current?.focus();
+    if (view.kind === 'grid') return;
+    const scroller =
+      overlayRef.current?.querySelector<HTMLElement>('.dim__scroll');
+    (scroller ?? overlayRef.current)?.focus();
   }, [view.kind]);
 
   // Fresh content starts at its top when stepping between projects.
@@ -229,7 +243,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
                 ← Back
               </button>
             </div>
-            <div className="dim__scroll" ref={scrollRef}>
+            <div className="dim__scroll" ref={scrollRef} tabIndex={-1}>
               <motion.div key={study.slug} {...swap} transition={transition}>
                 <CaseDetail
                   study={study}
@@ -258,7 +272,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
                 ← Back
               </button>
             </div>
-            <div className="dim__scroll">
+            <div className="dim__scroll" tabIndex={-1}>
               <div className="dimbody">
                 <header className="dim__hero dim__hero--short">
                   <span className="lab">Lab · open questions</span>
@@ -287,7 +301,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
                 ← Lab
               </button>
             </div>
-            <div className="dim__scroll" ref={scrollRef}>
+            <div className="dim__scroll" ref={scrollRef} tabIndex={-1}>
               <motion.div key={labEntry.slug} {...swap} transition={transition}>
                 <LabEntryDetail
                   entry={labEntry}
@@ -316,7 +330,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
                 ← Back
               </button>
             </div>
-            <div className="dim__scroll">
+            <div className="dim__scroll" tabIndex={-1}>
               <div className="dimbody">
                 <StoryDetail />
               </div>

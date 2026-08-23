@@ -762,6 +762,9 @@ a {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  /* Reaching the end of a dimension must not scroll the deck behind it. */
+  overscroll-behavior: contain;
+  outline: none;
   padding: 0 clamp(20px, 6vw, 110px) clamp(48px, 8vh, 100px);
 }
 
