@@ -522,10 +522,13 @@ a {
 }
 
 .headline--lead {
-  font-size: clamp(20px, 2.05vw, calc(var(--t-body) * 1.8));
-  letter-spacing: -0.026em;
-  line-height: 1.17;
-  max-width: 21ch;
+  /* Sized for the deck card, which is 70vw. The old 21ch cap was set when
+     this was a bento tile a third the width, and left the headline using
+     about a third of the card. */
+  font-size: clamp(26px, 3.6vw, 68px);
+  letter-spacing: -0.032em;
+  line-height: 1.06;
+  max-width: 30ch;
 }
 
 /* The short tiles have no visual, so their line settles into the middle. */
