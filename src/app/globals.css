@@ -764,7 +764,8 @@ a {
   padding: 0;
   font-size: var(--t-lg);
   line-height: 1;
-  border-radius: var(--r-sm);
+  /* Round: width and height match, so a pill radius gives a circle. */
+  border-radius: 999px;
 }
 
 .dim__scroll {
@@ -1013,6 +1014,12 @@ a {
   .wbtn,
   .hcard--surface {
     corner-shape: squircle;
+  }
+
+  /* The back button is a circle, not a squircle: at a pill radius the
+     superellipse reads as a rounded square instead of a round button. */
+  .dim__back {
+    corner-shape: round;
   }
 }
 
