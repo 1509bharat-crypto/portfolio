@@ -1,7 +1,5 @@
 'use client';
 
-import { motion } from 'motion/react';
-import Link from 'next/link';
 import { lab, labSlots } from '@/data/lab';
 import { Label, Placeholder } from './Primitives';
 
@@ -10,10 +8,16 @@ import { Label, Placeholder } from './Primitives';
  * experiment's log as its own full view (the same deck pattern the case
  * studies use), so the grid itself stays calm.
  *
- * Pass `onOpen` to drive the overlay on the home card; leave it off and the
- * boxes render as real links for the standalone /lab page.
+ * `onOpen` receives the box's rect so the log can grow out of it. Both the
+ * deck's lab dimension and the standalone /lab page pass one — the boxes used
+ * to be links on the standalone page, which swapped the whole route instead of
+ * opening in place.
  */
-export function LabGrid({ onOpen }: { onOpen?: (slug: string) => void }) {
+export function LabGrid({
+  onOpen,
+}: {
+  onOpen: (slug: string, origin: DOMRect) => void;
+}) {
   return (
     <div className="labgrid">
       {lab.map((entry) => {
@@ -30,23 +34,17 @@ export function LabGrid({ onOpen }: { onOpen?: (slug: string) => void }) {
           </>
         );
 
-        return onOpen ? (
-          <motion.button
+        return (
+          <button
             key={entry.slug}
-            layoutId={`dim-lab-${entry.slug}`}
             className="labbox labbox--x"
-            onClick={() => onOpen(entry.slug)}
+            aria-label={`Open lab log: ${entry.title}`}
+            onClick={(e) =>
+              onOpen(entry.slug, e.currentTarget.getBoundingClientRect())
+            }
           >
             {inner}
-          </motion.button>
-        ) : (
-          <Link
-            key={entry.slug}
-            href={`/lab/${entry.slug}`}
-            className="labbox labbox--x"
-          >
-            {inner}
-          </Link>
+          </button>
         );
       })}
 

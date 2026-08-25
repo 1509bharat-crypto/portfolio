@@ -35,9 +35,9 @@ function viewFromPath(path: string): View {
 }
 
 /**
- * Home is the deck; each card is a dimension. Clicking a card morphs it into
- * a full page (shared layoutId): the card's surface becomes the page's
- * background, a lone back button sits on top, and closing morphs it back into
+ * Home is the deck; each card is a dimension. Clicking a card grows it into a
+ * full page out of the card's own rect: the card's surface becomes the page's
+ * background, a lone back button sits on top, and closing shrinks it back into
  * its slot on the shelf.
  *
  * Stepping to the next project swaps the content inside the open dimension;
