@@ -181,16 +181,6 @@ export function HorizontalDeck({
         <>
           <Head study={study} />
           <p className="headline headline--lead">{study.headline}</p>
-          {study.stats?.length ? (
-            <div className="stats">
-              {study.stats.map((s) => (
-                <div className="stat" key={s.label}>
-                  <b>{s.value}</b>
-                  <span>{s.label}</span>
-                </div>
-              ))}
-            </div>
-          ) : null}
           <Placeholder className="flex-1" />
         </>
       ),
