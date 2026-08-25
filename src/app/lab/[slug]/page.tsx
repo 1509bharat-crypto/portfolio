@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { LabEntryDetail } from '@/components/LabEntryDetail';
+import { LabGrid } from '@/components/LabGrid';
 import { lab } from '@/data/lab';
 
 type Props = { params: Promise<{ slug: string }> };
@@ -17,34 +17,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const entry = getEntry(slug);
   if (!entry) return {};
   return {
-    title: `${entry.title} · Lab`,
-    description: entry.blurb,
-    openGraph: { title: entry.title, description: entry.blurb },
+    title: `${entry.title} — Lab`,
+    description: entry.question,
+    openGraph: { title: entry.title, description: entry.question },
   };
 }
 
-/** The log behind one experiment. Reached by clicking a box in the lab. */
+/**
+ * The same lab page, rendered with one box already expanded. A log is not a
+ * separate destination — it lives inside the grid — so a direct link opens the
+ * grid with that experiment open rather than a standalone page.
+ */
 export default async function LabEntryPage({ params }: Props) {
   const { slug } = await params;
-  const entry = getEntry(slug);
-  if (!entry) notFound();
-
-  const index = lab.findIndex((e) => e.slug === entry.slug);
-  const next = index < lab.length - 1 ? lab[index + 1] : null;
+  if (!getEntry(slug)) notFound();
 
   return (
     <div className="dimpage">
       <div className="dim__bar">
-        <Link className="wbtn dim__back" href="/lab">
-          ← Lab
+        <Link className="wbtn dim__back" href="/">
+          ← Back
         </Link>
       </div>
       <div className="dim__scroll">
-        <LabEntryDetail
-          entry={entry}
-          nextHref={next ? `/lab/${next.slug}` : undefined}
-          nextTitle={next?.title}
-        />
+        <div className="dimbody">
+          <header className="dim__hero dim__hero--short">
+            <span className="lab">Lab · open questions</span>
+            <h1 className="dim__title">Experiments</h1>
+          </header>
+          <LabGrid initialOpen={slug} />
+        </div>
       </div>
     </div>
   );

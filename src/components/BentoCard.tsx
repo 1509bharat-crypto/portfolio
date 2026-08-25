@@ -3,11 +3,9 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cases, getCase } from '@/data/cases';
-import { lab } from '@/data/lab';
 import { springCrisp } from '@/lib/motion';
 import { CaseDetail } from './CaseDetail';
 import { HorizontalDeck } from './HorizontalDeck';
-import { LabEntryDetail } from './LabEntryDetail';
 import { LabGrid } from './LabGrid';
 import { StoryDetail } from './StoryDetail';
 
@@ -15,21 +13,16 @@ type View =
   | { kind: 'grid' }
   | { kind: 'case'; slug: string }
   | { kind: 'lab' }
-  | { kind: 'labEntry'; slug: string }
   | { kind: 'story' };
-
-const getLabEntry = (slug: string) => lab.find((e) => e.slug === slug);
 
 function viewFromPath(path: string): View {
   if (path.startsWith('/work/')) {
     const slug = path.slice('/work/'.length).replace(/\/$/, '');
     return getCase(slug) ? { kind: 'case', slug } : { kind: 'grid' };
   }
-  if (path.startsWith('/lab/')) {
-    const slug = path.slice('/lab/'.length).replace(/\/$/, '');
-    return getLabEntry(slug) ? { kind: 'labEntry', slug } : { kind: 'lab' };
-  }
-  if (path === '/lab') return { kind: 'lab' };
+  // A lab log lives inside the grid, so /lab/<slug> is still the lab view;
+  // LabGrid reads the slug off the URL and expands that box itself.
+  if (path === '/lab' || path.startsWith('/lab/')) return { kind: 'lab' };
   if (path === '/story') return { kind: 'story' };
   return { kind: 'grid' };
 }
@@ -91,15 +84,6 @@ export function BentoCard({ initialView }: { initialView?: View }) {
     [go],
   );
 
-  const openLabEntry = useCallback(
-    (slug: string, from?: DOMRect) => {
-      setDir(0);
-      if (from) setOrigin(from);
-      go({ kind: 'labEntry', slug }, `/lab/${slug}`);
-    },
-    [go],
-  );
-
   const openStory = useCallback(() => {
     setDir(0);
     lastFocused.current = document.activeElement as HTMLElement;
@@ -123,26 +107,11 @@ export function BentoCard({ initialView }: { initialView?: View }) {
       : undefined;
   const prevCase = caseIndex > 0 ? cases[caseIndex - 1] : undefined;
 
-  const labEntry = view.kind === 'labEntry' ? getLabEntry(view.slug) : undefined;
-  const labIndex = labEntry
-    ? lab.findIndex((e) => e.slug === labEntry.slug)
-    : -1;
-  const nextLab =
-    labIndex >= 0 && labIndex < lab.length - 1 ? lab[labIndex + 1] : undefined;
-  const prevLab = labIndex > 0 ? lab[labIndex - 1] : undefined;
-
   const stepCase = (delta: -1 | 1) => {
     const target = delta === -1 ? prevCase : nextCase;
     if (!target) return;
     setDir(delta);
     go({ kind: 'case', slug: target.slug }, `/work/${target.slug}`);
-  };
-
-  const stepLab = (delta: -1 | 1) => {
-    const target = delta === -1 ? prevLab : nextLab;
-    if (!target) return;
-    setDir(delta);
-    go({ kind: 'labEntry', slug: target.slug }, `/lab/${target.slug}`);
   };
 
   // Browser back/forward drives the same state the buttons do.
@@ -157,17 +126,12 @@ export function BentoCard({ initialView }: { initialView?: View }) {
     if (view.kind === 'grid') return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (view.kind === 'labEntry') openLab();
-        else close();
+        close();
         return;
       }
       if (view.kind === 'case') {
         if (e.key === 'ArrowRight') stepCase(1);
         if (e.key === 'ArrowLeft') stepCase(-1);
-      }
-      if (view.kind === 'labEntry') {
-        if (e.key === 'ArrowRight') stepLab(1);
-        if (e.key === 'ArrowLeft') stepLab(-1);
       }
     };
     document.addEventListener('keydown', onKey);
@@ -203,8 +167,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
   }, [view.kind]);
 
   // Fresh content starts at its top when stepping between projects.
-  const contentKey =
-    view.kind === 'case' || view.kind === 'labEntry' ? view.slug : view.kind;
+  const contentKey = view.kind === 'case' ? view.slug : view.kind;
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
   }, [contentKey]);
@@ -314,40 +277,8 @@ export function BentoCard({ initialView }: { initialView?: View }) {
                   <span className="lab">Lab · open questions</span>
                   <h1 className="dim__title">Experiments</h1>
                 </header>
-                <LabGrid onOpen={openLabEntry} />
+                <LabGrid />
               </div>
-            </div>
-          </motion.div>
-        ) : null}
-
-        {labEntry ? (
-          <motion.div
-            key="labentry-dim"
-            ref={overlayRef}
-            tabIndex={-1}
-            role="dialog"
-            aria-modal="true"
-            aria-label={`Lab: ${labEntry.title}`}
-            className="dim dim--top"
-            style={growStyle}
-            transition={transition}
-            {...grow}
-          >
-            <div className="dim__bar">
-              {/* Wrapped: openLab takes an optional rect, and passing it bare
-                  would hand it the click event as the origin. */}
-              <button className="wbtn dim__back" onClick={() => openLab()}>
-                ← Lab
-              </button>
-            </div>
-            <div className="dim__scroll" ref={scrollRef} tabIndex={-1}>
-              <motion.div key={labEntry.slug} {...swap} transition={transition}>
-                <LabEntryDetail
-                  entry={labEntry}
-                  onNext={nextLab ? () => stepLab(1) : undefined}
-                  nextTitle={nextLab?.title}
-                />
-              </motion.div>
             </div>
           </motion.div>
         ) : null}

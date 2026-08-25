@@ -900,15 +900,68 @@ a {
 .labbox--slot { border-style: dashed; }
 .labbox--slot .lab { color: var(--numeral); }
 
-/* A box is one click: it opens that experiment's log as its own view. */
+/* A box expands in place: it grows to span 2x2 and reveals its log inside
+   itself, and the other boxes animate to their new slots around it. */
 .labbox--x {
-  cursor: pointer;
-  text-align: left;
   color: inherit;
   transition: border-color 0.15s, background 0.15s;
 }
 
 .labbox--x:hover { border-color: var(--accent-line); }
+
+.labbox__toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+.labbox--x[data-expanded='true'] {
+  grid-column: span 2;
+  grid-row: span 2;
+  border-color: var(--accent-line);
+  background: color-mix(in srgb, var(--accent) 4%, var(--card));
+}
+
+.labbox--x[data-expanded='true'] .labbox__toggle {
+  flex: none;
+}
+
+.labmore {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  border-top: 1px dashed var(--line);
+  margin-top: 10px;
+  padding-top: 12px;
+}
+
+.labmore__blocks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.labmore__ph {
+  flex: 1;
+  min-height: clamp(70px, 12vh, 140px);
+}
+
+@media (max-width: 900px) {
+  /* One or two columns cannot spare two, and expanding in place has no
+     meaning when the grid is a single file. */
+  .labbox--x[data-expanded='true'] {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .labmore__blocks { grid-template-columns: 1fr; }
+}
 
 /* ------------------------------------------------------------------ *
  * Responsive.
