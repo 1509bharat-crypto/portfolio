@@ -687,17 +687,21 @@ a {
 .hpitch {
   font-family: var(--font-display-family);
   font-variation-settings: 'opsz' 96, 'wdth' 96;
-  /* Sized to break in two lines rather than to be as large as possible: at
-     this measure a 28-character line is the limit, and anything past roughly
-     4.5vw pushes the sentence to a third line. */
-  font-size: clamp(32px, 4.2vw, 72px);
+  /* The lines are chosen in the data rather than found by wrapping, so the
+     type is bounded by the longest phrase — "conversations between", 21
+     characters — instead of by a 28-character measure. That is what lets it
+     be this large. */
+  font-size: clamp(32px, 5.4vw, 96px);
   font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.04;
-  /* Two lines: the pitch is 51 characters, so the measure has to clear about
-     26 per line. */
-  max-width: 28ch;
-  text-wrap: balance;
+  letter-spacing: -0.034em;
+  line-height: 1.0;
+  max-width: none;
+  text-wrap: normal;
+}
+
+/* Every phrase takes its own line, at every width. */
+.hpitch__line {
+  display: block;
 }
 
 .hdeck__hint {
@@ -769,17 +773,6 @@ a {
   padding: 24px 10px;
 }
 
-/* On a phone the pitch breaks where it was written to break, rather than
-   wherever the measure happens to run out. Each phrase takes its own line. */
-.vdeck .hpitch__line {
-  display: block;
-}
-
-.vdeck .hpitch {
-  /* Balance has nothing to do once the lines are chosen. */
-  text-wrap: normal;
-  max-width: none;
-}
 
 /* ------------------------------------------------------------------ *
  * Dimension: a card opened into a full page. The card's surface becomes
