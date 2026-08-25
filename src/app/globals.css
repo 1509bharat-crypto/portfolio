@@ -704,6 +704,34 @@ a {
   display: block;
 }
 
+/* The rotating word in the pitch. Every candidate is stacked invisibly in the
+   same grid cell so the slot is as wide as the longest, and the live word is
+   taken out of flow on top — otherwise the word that follows it on the line
+   would shift on every change. */
+.rotw {
+  position: relative;
+  display: inline-grid;
+  vertical-align: baseline;
+}
+
+.rotw__ghost {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  white-space: pre;
+}
+
+.rotw__live {
+  position: absolute;
+  inset: 0;
+  text-align: left;
+  white-space: pre;
+}
+
+/* Each word needs its own box for the stagger to move it vertically. */
+.rotw__word {
+  display: inline-block;
+}
+
 .hdeck__hint {
   /* Not --numeral: that value is calibrated against --card, and the pitch card
      is transparent, so on the ground it lands at 4.01:1 and fails AA. The same

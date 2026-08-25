@@ -9,11 +9,23 @@ export const profile: Profile = {
   location: 'Amsterdam',
   availability: 'Open to senior IC roles',
   pitch: 'I design and build conversations between people and machines.',
-  pitchLines: [
-    'I design and build',
-    'conversations between',
-    'people and machines.',
-  ],
+  pitchParts: {
+    lead: 'I design and build',
+    /**
+     * Each is grounded in this repo: conversations from Mona, trust from
+     * Mona's "Trust & anonymity at enterprise scale", understanding from the
+     * story's "how do people and the things they use understand each other?",
+     * agents from De Wacht's voice agent. The first must match `pitch`. Add or
+     * reorder freely — the slot sizes itself to the longest.
+     */
+    rotating: [
+      'conversations between',
+      'trust across',
+      'understanding between',
+      'agents linking',
+    ],
+    tail: 'people and machines.',
+  },
   disciplines: [
     'Conversation design',
     'Voice UX',

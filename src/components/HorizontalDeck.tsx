@@ -9,13 +9,14 @@ import {
   useVelocity,
   type MotionValue,
 } from 'motion/react';
-import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { flagship, otherCases, primaryCases } from '@/data/cases';
 import { lab, labIntro } from '@/data/lab';
 import { profile } from '@/data/profile';
 import type { CaseStudy } from '@/lib/types';
 import { Availability, IdentityLinks } from './Identity';
 import { Label, Placeholder } from './Primitives';
+import { RotatingWord } from './RotatingWord';
 
 /** Card width (70vw) plus the gap between cards (4vw). */
 const STEP_VW = 74;
@@ -223,14 +224,15 @@ export function HorizontalDeck({
             {profile.name} · {profile.role} · {profile.location}
           </span>
           <p className="hpitch">
-            {profile.pitchLines.map((line, i) => (
-              <Fragment key={line}>
-                {/* The separator sits between the spans, not inside them, so
-                    a line does not start with a space once they go block. */}
-                {i > 0 ? ' ' : null}
-                <span className="hpitch__line">{line}</span>
-              </Fragment>
-            ))}
+            {/* The sentence a screen reader gets, without the rotation. */}
+            <span className="sr-only">{profile.pitch}</span>
+            <span aria-hidden>
+              <span className="hpitch__line">{profile.pitchParts.lead}</span>{' '}
+              <span className="hpitch__line">
+                <RotatingWord words={profile.pitchParts.rotating} />
+              </span>{' '}
+              <span className="hpitch__line">{profile.pitchParts.tail}</span>
+            </span>
           </p>
           <span className="lab hdeck__hint" aria-hidden>
             scroll →

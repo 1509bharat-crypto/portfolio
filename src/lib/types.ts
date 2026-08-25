@@ -80,14 +80,22 @@ export type Profile = {
   availability: string;
   pitch: string;
   /**
-   * The pitch as chosen phrases. On a phone each becomes its own line, because
-   * a good break there is a decision rather than something the browser should
-   * guess; on wider screens they run together and wrap normally.
-   *
-   * Joining these with single spaces must reproduce `pitch` exactly — the deck
-   * asserts it in development.
+   * The pitch as three chosen lines, with the second one's opening word
+   * rotating. Breaks are decided here rather than left to wrapping, at every
+   * width. `lead`, the first rotating word, `after` and `tail` joined with
+   * single spaces must reproduce `pitch` exactly.
    */
-  pitchLines: string[];
+  pitchParts: {
+    lead: string;
+    /**
+     * The whole of line two, cycling. Rotating the phrase rather than a single
+     * noun frees the preposition too, so each entry can find its own way into
+     * `tail`. Every one must read as a sentence with `lead` before it and
+     * `tail` after it.
+     */
+    rotating: string[];
+    tail: string;
+  };
   disciplines: string[];
   story: string;
   now: {
