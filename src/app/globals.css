@@ -687,15 +687,15 @@ a {
 .hpitch {
   font-family: var(--font-display-family);
   font-variation-settings: 'opsz' 96, 'wdth' 96;
-  /* The cover is the one place the site speaks at full volume, so the pitch
-     is set as large as the card allows. */
-  font-size: clamp(38px, 6vw, 110px);
+  /* Sized to break in two lines rather than to be as large as possible: at
+     this measure a 28-character line is the limit, and anything past roughly
+     4.5vw pushes the sentence to a third line. */
+  font-size: clamp(32px, 4.2vw, 72px);
   font-weight: 600;
-  /* Tracking tightens as the size grows. */
-  letter-spacing: -0.038em;
-  line-height: 1.0;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
   /* Two lines: the pitch is 51 characters, so the measure has to clear about
-     26 per line. 18ch forced a third. */
+     26 per line. */
   max-width: 28ch;
   text-wrap: balance;
 }
