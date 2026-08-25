@@ -79,6 +79,15 @@ export type Profile = {
   location: string;
   availability: string;
   pitch: string;
+  /**
+   * The pitch as chosen phrases. On a phone each becomes its own line, because
+   * a good break there is a decision rather than something the browser should
+   * guess; on wider screens they run together and wrap normally.
+   *
+   * Joining these with single spaces must reproduce `pitch` exactly — the deck
+   * asserts it in development.
+   */
+  pitchLines: string[];
   disciplines: string[];
   story: string;
   now: {

@@ -9,7 +9,7 @@ import {
   useVelocity,
   type MotionValue,
 } from 'motion/react';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { flagship, otherCases, primaryCases } from '@/data/cases';
 import { lab, labIntro } from '@/data/lab';
 import { profile } from '@/data/profile';
@@ -222,7 +222,16 @@ export function HorizontalDeck({
           <span className="lab">
             {profile.name} · {profile.role} · {profile.location}
           </span>
-          <p className="hpitch">{profile.pitch}</p>
+          <p className="hpitch">
+            {profile.pitchLines.map((line, i) => (
+              <Fragment key={line}>
+                {/* The separator sits between the spans, not inside them, so
+                    a line does not start with a space once they go block. */}
+                {i > 0 ? ' ' : null}
+                <span className="hpitch__line">{line}</span>
+              </Fragment>
+            ))}
+          </p>
           <span className="lab hdeck__hint" aria-hidden>
             scroll →
           </span>

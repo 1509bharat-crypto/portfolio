@@ -9,6 +9,7 @@ export const profile: Profile = {
   location: 'Amsterdam',
   availability: 'Open to senior IC roles',
   pitch: 'I design conversations between people and machines.',
+  pitchLines: ['I design', 'conversations between', 'people and machines.'],
   disciplines: [
     'Conversation design',
     'Voice UX',

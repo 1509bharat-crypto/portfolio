@@ -769,6 +769,18 @@ a {
   padding: 24px 10px;
 }
 
+/* On a phone the pitch breaks where it was written to break, rather than
+   wherever the measure happens to run out. Each phrase takes its own line. */
+.vdeck .hpitch__line {
+  display: block;
+}
+
+.vdeck .hpitch {
+  /* Balance has nothing to do once the lines are chosen. */
+  text-wrap: normal;
+  max-width: none;
+}
+
 /* ------------------------------------------------------------------ *
  * Dimension: a card opened into a full page. The card's surface becomes
  * the page background; a lone back button floats on top; inside, the
