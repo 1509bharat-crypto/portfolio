@@ -97,6 +97,7 @@
   --color-accent: var(--accent);
   --font-sans: var(--font-archivo);
   --font-mono: var(--font-plex-mono);
+  --font-display-family: var(--font-display), var(--font-archivo), system-ui, sans-serif;
 }
 
 /* ------------------------------------------------------------------ *
@@ -522,6 +523,8 @@ a {
 }
 
 .headline--lead {
+  font-family: var(--font-display-family);
+  font-variation-settings: 'opsz' 72, 'wdth' 96;
   /* Sized for the deck card, which is 70vw. The old 21ch cap was set when
      this was a bento tile a third the width, and left the headline using
      about a third of the card. */
@@ -681,12 +684,407 @@ a {
 }
 
 .hpitch {
+  font-family: var(--font-display-family);
+  font-variation-settings: 'opsz' 96, 'wdth' 96;
   font-size: clamp(34px, 4.5vw, 76px);
   font-weight: 600;
   letter-spacing: -0.03em;
-  line-height: 1.06;
-  max-width: 18ch;
+  line-height: 1.04;
+  /* Two lines: the pitch is 51 characters, so the measure has to clear ~26
+     per line. 18ch forced a third line. */
+  max-width: 28ch;
   text-wrap: balance;
+}
+
+.headline {
+  font-size: clamp(16px, 1.35vw, calc(var(--t-body) * 1.4));
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  line-height: 1.25;
+  color: var(--ink);
+  max-width: 26ch;
+  text-wrap: balance;
+}
+
+.headline--lead {
+  font-family: var(--font-display-family);
+  font-variation-settings: 'opsz' 72, 'wdth' 96;
+  /* Sized for the deck card, which is 70vw. The old 21ch cap was set when
+     this was a bento tile a third the width, and left the headline using
+     about a third of the card. */
+  font-size: clamp(26px, 3.6vw, 68px);
+  letter-spacing: -0.032em;
+  line-height: 1.06;
+  max-width: 30ch;
+}
+
+/* The short tiles have no visual, so their line settles into the middle. */
+.headline--small {
+  font-size: var(--t-md);
+  letter-spacing: -0.008em;
+  max-width: 32ch;
+  margin-block: auto;
+}
+
+/* The project name inside the mono label. */
+.lab__name {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.csnum {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--t-md);
+  font-weight: 400;
+  color: var(--numeral);
+  letter-spacing: 0.02em;
+}
+
+.lisa-sub {
+  font-size: var(--t-md);
+  color: var(--muted);
+  max-width: 44ch;
+}
+
+.stats {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.stat b {
+  font-size: var(--t-lg);
+  font-weight: 600;
+  display: block;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.stat span {
+  font-size: var(--t-label);
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.c-lisa .ph { flex: 1; min-height: 50px; }
+
+.caselist {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.caselist li {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+  align-items: baseline;
+}
+
+/* ------------------------------------------------------------------ *
+ * The deck: home as one horizontal run of viewport-sized cards.
+ * Vertical scroll drives horizontal travel; snap stops keep one card
+ * in focus; the track zooms with scroll speed and settles at rest.
+ * ------------------------------------------------------------------ */
+.hdeck {
+  position: relative;
+}
+
+/* Invisible full-height snap stops, one per card. */
+.hdeck__step {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  height: 100vh;
+  scroll-snap-align: start;
+}
+
+.hdeck__viewport {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  /* The blend at the edges: neighbours dissolve into the ground. */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 7%,
+    black 93%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 7%,
+    black 93%,
+    transparent 100%
+  );
+}
+
+.hdeck__track {
+  display: flex;
+  align-items: stretch;
+  gap: 4vw;
+  padding-left: 15vw;
+  will-change: transform;
+}
+
+.hcard {
+  flex: none;
+  width: 70vw;
+  height: min(78vh, 860px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.2vw, 20px);
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  color: inherit;
+}
+
+.hcard--surface {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow);
+  padding: clamp(24px, 2.6vw, 48px) clamp(24px, 3vw, 56px);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.hcard--surface:hover {
+  border-color: var(--accent-line);
+}
+
+/* The pitch and the sign-off sit straight on the ground, no surface. */
+.hcard--pitch {
+  justify-content: center;
+  gap: clamp(16px, 1.6vw, 28px);
+  padding: 0 2vw;
+}
+
+.hpitch {
+  font-family: var(--font-display-family);
+  font-variation-settings: 'opsz' 96, 'wdth' 96;
+  font-size: clamp(34px, 4.5vw, 76px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  /* Two lines: the pitch is 51 characters, so the measure has to clear ~26
+     per line. 18ch forced a third line. */
+  max-width: 28ch;
+  text-wrap: balance;
+}
+
+.headline {
+  font-size: clamp(16px, 1.35vw, calc(var(--t-body) * 1.4));
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  line-height: 1.25;
+  color: var(--ink);
+  max-width: 26ch;
+  text-wrap: balance;
+}
+
+.headline--lead {
+  font-family: var(--font-display-family);
+  font-variation-settings: 'opsz' 72, 'wdth' 96;
+  /* Sized for the deck card, which is 70vw. The old 21ch cap was set when
+     this was a bento tile a third the width, and left the headline using
+     about a third of the card. */
+  font-size: clamp(26px, 3.6vw, 68px);
+  letter-spacing: -0.032em;
+  line-height: 1.06;
+  max-width: 30ch;
+}
+
+/* The short tiles have no visual, so their line settles into the middle. */
+.headline--small {
+  font-size: var(--t-md);
+  letter-spacing: -0.008em;
+  max-width: 32ch;
+  margin-block: auto;
+}
+
+/* The project name inside the mono label. */
+.lab__name {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.csnum {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--t-md);
+  font-weight: 400;
+  color: var(--numeral);
+  letter-spacing: 0.02em;
+}
+
+.lisa-sub {
+  font-size: var(--t-md);
+  color: var(--muted);
+  max-width: 44ch;
+}
+
+.stats {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.stat b {
+  font-size: var(--t-lg);
+  font-weight: 600;
+  display: block;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.stat span {
+  font-size: var(--t-label);
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.c-lisa .ph { flex: 1; min-height: 50px; }
+
+.caselist {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.caselist li {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+  align-items: baseline;
+}
+
+/* ------------------------------------------------------------------ *
+ * The deck: home as one horizontal run of viewport-sized cards.
+ * Vertical scroll drives horizontal travel; snap stops keep one card
+ * in focus; the track zooms with scroll speed and settles at rest.
+ * ------------------------------------------------------------------ */
+.hdeck {
+  position: relative;
+}
+
+/* Invisible full-height snap stops, one per card. */
+.hdeck__step {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  height: 100vh;
+  scroll-snap-align: start;
+}
+
+.hdeck__viewport {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  /* The blend at the edges: neighbours dissolve into the ground. */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 7%,
+    black 93%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 7%,
+    black 93%,
+    transparent 100%
+  );
+}
+
+.hdeck__track {
+  display: flex;
+  align-items: stretch;
+  gap: 4vw;
+  padding-left: 15vw;
+  will-change: transform;
+}
+
+.hcard {
+  flex: none;
+  width: 70vw;
+  height: min(78vh, 860px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.2vw, 20px);
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  color: inherit;
+}
+
+.hcard--surface {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow);
+  padding: clamp(24px, 2.6vw, 48px) clamp(24px, 3vw, 56px);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.hcard--surface:hover {
+  border-color: var(--accent-line);
+}
+
+/* The pitch and the sign-off sit straight on the ground, no surface. */
+.hcard--pitch {
+  justify-content: center;
+  gap: clamp(16px, 1.6vw, 28px);
+  padding: 0 2vw;
+}
+
+.hpitch {
+  font-family: var(--font-display-family);
+  font-variation-settings: 'opsz' 96, 'wdth' 96;
+  font-size: clamp(34px, 4.5vw, 76px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  /* Two lines: the pitch is 51 characters, so the measure has to clear ~26
+     per line. 18ch forced a third line. */
+  max-width: 28ch;
+  text-wrap: balance;
+}
+
+/* ---------- the flip board ---------- */
+.flap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: clamp(14px, 2.4vh, 30px);
+}
+
+.flap__cell {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--t-sm);
+  line-height: 1;
+  color: var(--ink);
+  background: var(--ph);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  width: 1.35em;
+  padding: 6px 0;
+  text-align: center;
+  /* Equal cells are what make it read as a board rather than as text. */
+  font-variant-numeric: tabular-nums;
 }
 
 .hdeck__hint {
