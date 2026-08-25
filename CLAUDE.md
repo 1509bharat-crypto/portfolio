@@ -26,7 +26,7 @@ Three levers carry the work: **typography, motion, visuals**. Text is the last r
 
 1. **One card in focus on desktop.** Home is a horizontal deck: vertical scroll drives horizontal travel, full-height snap stops keep exactly one card centered, and the track zooms with scroll velocity. Detail views fit the viewport with no internal scrolling beyond their own content area.
 2. **Mobile may scroll**, and may reach the same understanding through different interactions. It is not a squeezed desktop.
-3. **Word budgets.** Home ≤ 160 words on screen, any other view ≤ 120, any single block ≤ 25. A block is a title plus a visual; prose is the exception that has to earn itself.
+3. **Word budgets.** ≤ 160 words on screen at once — on the deck that means the heaviest single card, since only one is ever in view — any other view ≤ 120, any single block ≤ 25. A block is a title plus a visual; prose is the exception that has to earn itself.
 4. **Hierarchy before explanation.** If you can't tell what matters with the text blurred, the typography is doing too little and the copy too much. Fix the type, don't add a sentence.
 5. **Motion must inform.** Every animation says where something came from, what changed, or what is live. Bars draw because a wireframe rule gets drawn; the dot breathes because availability is the one live fact. No ambient decoration.
 6. **One accent.** The neutral ramp and hairlines do everything else. A second hue needs a reason.

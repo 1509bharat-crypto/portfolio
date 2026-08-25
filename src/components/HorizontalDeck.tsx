@@ -14,7 +14,7 @@ import { flagship, otherCases, primaryCases } from '@/data/cases';
 import { lab, labIntro } from '@/data/lab';
 import { profile } from '@/data/profile';
 import type { CaseStudy } from '@/lib/types';
-import { Availability, IdentityLinks } from './Identity';
+import { HelloCard } from './HelloCard';
 import { Label, Placeholder } from './Primitives';
 import { RotatingWord } from './RotatingWord';
 
@@ -289,20 +289,8 @@ export function HorizontalDeck({
     },
     {
       key: 'end',
-      className: 'hcard--pitch',
-      body: (
-        <>
-          <span className="lab">{profile.story}</span>
-          <p className="hpitch">Say hello.</p>
-          <Availability />
-          <div className="hcard__actions">
-            <button className="go" onClick={onOpenStory}>
-              Read the story →
-            </button>
-          </div>
-          <IdentityLinks />
-        </>
-      ),
+      className: 'hcard--pitch hcard--hello',
+      body: <HelloCard onOpenStory={onOpenStory} />,
     },
   ];
 

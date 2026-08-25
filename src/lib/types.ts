@@ -97,6 +97,10 @@ export type Profile = {
     tail: string;
   };
   disciplines: string[];
+  /** How the work gets made. Three at most — this is a card, not a manifesto. */
+  howIWork: string[];
+  /** What the work is held to. Same limit, same reason. */
+  values: string[];
   story: string;
   now: {
     where: string;

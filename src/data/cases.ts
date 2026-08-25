@@ -107,3 +107,10 @@ export const otherCases = cases.filter((c) => c.rank === 'other');
 export function getCase(slug: string): CaseStudy | undefined {
   return cases.find((c) => c.slug === slug);
 }
+
+/**
+ * Everything shipped with, across every case study, in first-appearance
+ * order. Derived rather than listed, so adding a tool to a case study adds it
+ * to the contact card and nowhere has to be kept in sync.
+ */
+export const stack = [...new Set(cases.flatMap((c) => c.stack ?? []))];

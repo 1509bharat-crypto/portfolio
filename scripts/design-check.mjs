@@ -159,7 +159,23 @@ const PROBE = `(() => {
 
   const vw = window.innerWidth;
   return JSON.stringify({
-    totalWords: words(document.body.innerText),
+    // "Words on screen" means what a reader sees at once. On the deck that is
+    // one card, not all seven, so the budget applies to the heaviest single
+    // card; everywhere else the page is the view. Screen-reader-only text is
+    // excluded either way — innerText includes it, since it is clipped rather
+    // than hidden.
+    totalWords: (() => {
+      const srOnly = (root) =>
+        [...root.querySelectorAll('.sr-only')]
+          .reduce((n, el) => n + words(el.textContent), 0);
+      const cards = [...document.querySelectorAll('.hcard')];
+      if (cards.length) {
+        return Math.max(
+          ...cards.map((c) => words(c.innerText) - srOnly(c)),
+        );
+      }
+      return words(document.body.innerText) - srOnly(document);
+    })(),
     overflowX: document.documentElement.scrollWidth - vw,
     internalScrollers: scrollers,
     longest,
