@@ -764,7 +764,8 @@ a {
 }
 
 .vdeck .hcard--pitch {
-  min-height: 62svh;
+  /* Same height as every other card: it is one stop in the same run, and a
+     short landing card broke the snap rhythm before you had scrolled once. */
   padding: 24px 10px;
 }
 
