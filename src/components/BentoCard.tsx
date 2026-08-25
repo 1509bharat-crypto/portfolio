@@ -55,9 +55,14 @@ export function BentoCard({ initialView }: { initialView?: View }) {
   const lastFocused = useRef<HTMLElement | null>(null);
   /** -1 stepping back, 1 stepping forward, 0 opening fresh. */
   const [dir, setDir] = useState(0);
-  /** The card each open dimension grew out of, for the morph home. */
-  const [caseOrigin, setCaseOrigin] = useState<string | null>(null);
-  const [labOrigin, setLabOrigin] = useState<string | null>(null);
+  /**
+   * The on-screen rect of the card the dimension grew out of, so it can grow
+   * from there and shrink back to it. A plain rect rather than a shared
+   * `layoutId`: the deck's track owns a scroll-driven `x`, and layout
+   * projection writes to that same transform, which left the track thousands
+   * of pixels adrift after a close.
+   */
+  const [origin, setOrigin] = useState<DOMRect | null>(null);
 
   const go = useCallback((next: View, path: string) => {
     if (typeof window !== 'undefined' && window.location.pathname !== path) {
@@ -67,25 +72,29 @@ export function BentoCard({ initialView }: { initialView?: View }) {
   }, []);
 
   const openCase = useCallback(
-    (slug: string) => {
+    (slug: string, from?: DOMRect) => {
       setDir(0);
-      setCaseOrigin(slug);
+      if (from) setOrigin(from);
       lastFocused.current = document.activeElement as HTMLElement;
       go({ kind: 'case', slug }, `/work/${slug}`);
     },
     [go],
   );
 
-  const openLab = useCallback(() => {
-    setDir(0);
-    lastFocused.current = document.activeElement as HTMLElement;
-    go({ kind: 'lab' }, '/lab');
-  }, [go]);
+  const openLab = useCallback(
+    (from?: DOMRect) => {
+      setDir(0);
+      if (from) setOrigin(from);
+      lastFocused.current = document.activeElement as HTMLElement;
+      go({ kind: 'lab' }, '/lab');
+    },
+    [go],
+  );
 
   const openLabEntry = useCallback(
-    (slug: string) => {
+    (slug: string, from?: DOMRect) => {
       setDir(0);
-      setLabOrigin(slug);
+      if (from) setOrigin(from);
       go({ kind: 'labEntry', slug }, `/lab/${slug}`);
     },
     [go],
@@ -99,8 +108,8 @@ export function BentoCard({ initialView }: { initialView?: View }) {
 
   const close = useCallback(() => {
     setDir(0);
-    setCaseOrigin(null);
-    setLabOrigin(null);
+    // `origin` is intentionally kept: AnimatePresence renders the exiting
+    // dimension with its last props, and it needs the rect to shrink back to.
     go({ kind: 'grid' }, '/');
     lastFocused.current?.focus?.();
   }, [go]);
@@ -217,6 +226,31 @@ export function BentoCard({ initialView }: { initialView?: View }) {
         exit: { opacity: 0, y: 6, scale: 0.995 },
       };
 
+  /**
+   * Grow the dimension out of the card's rect and shrink it back to the same
+   * place. `.dim` is fixed at inset 0, so with a top-left origin a translate
+   * to the card's corner plus a uniform scale of card-width / viewport-width
+   * lands exactly on the card.
+   */
+  const grow =
+    reduced || !origin
+      ? fade
+      : (() => {
+          const at = {
+            opacity: 0,
+            x: origin.left,
+            y: origin.top,
+            scale: origin.width / window.innerWidth,
+          };
+          return {
+            initial: at,
+            animate: { opacity: 1, x: 0, y: 0, scale: 1 },
+            exit: at,
+          };
+        })();
+
+  const growStyle = { transformOrigin: 'top left' as const };
+
   return (
     <>
       <HorizontalDeck
@@ -229,14 +263,15 @@ export function BentoCard({ initialView }: { initialView?: View }) {
         {study ? (
           <motion.div
             key="case-dim"
-            layoutId={`dim-${caseOrigin ?? study.slug}`}
             ref={overlayRef}
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-label={`Case study: ${study.title}`}
             className="dim"
+            style={growStyle}
             transition={transition}
+            {...grow}
           >
             <div className="dim__bar">
               <button className="wbtn dim__back" onClick={close}>
@@ -258,14 +293,15 @@ export function BentoCard({ initialView }: { initialView?: View }) {
         {view.kind === 'lab' ? (
           <motion.div
             key="lab-dim"
-            layoutId="dim-lab"
             ref={overlayRef}
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-label="Lab"
             className="dim"
+            style={growStyle}
             transition={transition}
+            {...grow}
           >
             <div className="dim__bar">
               <button className="wbtn dim__back" onClick={close}>
@@ -287,17 +323,20 @@ export function BentoCard({ initialView }: { initialView?: View }) {
         {labEntry ? (
           <motion.div
             key="labentry-dim"
-            layoutId={`dim-lab-${labOrigin ?? labEntry.slug}`}
             ref={overlayRef}
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-label={`Lab: ${labEntry.title}`}
             className="dim dim--top"
+            style={growStyle}
             transition={transition}
+            {...grow}
           >
             <div className="dim__bar">
-              <button className="wbtn dim__back" onClick={openLab}>
+              {/* Wrapped: openLab takes an optional rect, and passing it bare
+                  would hand it the click event as the origin. */}
+              <button className="wbtn dim__back" onClick={() => openLab()}>
                 ← Lab
               </button>
             </div>

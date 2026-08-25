@@ -24,9 +24,17 @@ type DeckItem = {
   key: string;
   className?: string;
   ariaLabel?: string;
-  onClick?: () => void;
-  /** Shared-element id: the card morphs into the dimension that carries it. */
-  layoutId?: string;
+  /**
+   * Receives the card's on-screen rect so the dimension can grow out of it.
+   *
+   * Deliberately NOT a shared `layoutId`. The track carries a scroll-driven
+   * `x` MotionValue, and it is also an ancestor of anything participating in a
+   * layout projection — so Framer's projection and `useScroll` end up writing
+   * the same `transform`. On close the projection's restore fought the scroll
+   * value and left the whole track translated several thousand pixels off,
+   * which stranded the deck. Handing the rect over keeps the two systems apart.
+   */
+  onClick?: (origin: DOMRect) => void;
   body: ReactNode;
 };
 
@@ -86,14 +94,14 @@ function DeckCard({
 
   const style = reduced ? { opacity } : { opacity, scale };
   const className = `hcard ${item.className ?? ''}`;
+  const onClick = item.onClick;
 
-  return item.onClick ? (
+  return onClick ? (
     <motion.button
       style={style}
       className={className}
-      onClick={item.onClick}
+      onClick={(e) => onClick(e.currentTarget.getBoundingClientRect())}
       aria-label={item.ariaLabel}
-      layoutId={item.layoutId}
     >
       {item.body}
     </motion.button>
@@ -116,8 +124,8 @@ export function HorizontalDeck({
   onOpenLab,
   onOpenStory,
 }: {
-  onOpenCase: (slug: string) => void;
-  onOpenLab: () => void;
+  onOpenCase: (slug: string, origin?: DOMRect) => void;
+  onOpenLab: (origin?: DOMRect) => void;
   onOpenStory: () => void;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -168,8 +176,7 @@ export function HorizontalDeck({
       key: study.slug,
       className: 'hcard--surface',
       ariaLabel: `Open case study: ${study.title}`,
-      layoutId: `dim-${study.slug}`,
-      onClick: () => onOpenCase(study.slug),
+      onClick: (origin: DOMRect) => onOpenCase(study.slug, origin),
       body: (
         <>
           <Head study={study} />
@@ -192,8 +199,7 @@ export function HorizontalDeck({
       key: 'others',
       className: 'hcard--surface',
       ariaLabel: 'Open other case studies',
-      layoutId: `dim-${otherCases[0].slug}`,
-      onClick: () => onOpenCase(otherCases[0].slug),
+      onClick: (origin: DOMRect) => onOpenCase(otherCases[0].slug, origin),
       body: (
         <>
           <div className="cellhead">
@@ -211,8 +217,7 @@ export function HorizontalDeck({
       key: 'lab',
       className: 'hcard--surface',
       ariaLabel: 'Open the lab',
-      layoutId: 'dim-lab',
-      onClick: onOpenLab,
+      onClick: (origin: DOMRect) => onOpenLab(origin),
       body: (
         <>
           <div className="cellhead">
@@ -265,7 +270,7 @@ export function HorizontalDeck({
             <button
               key={item.key}
               className={`hcard ${item.className ?? ''}`}
-              onClick={item.onClick}
+              onClick={(e) => item.onClick?.(e.currentTarget.getBoundingClientRect())}
               aria-label={item.ariaLabel}
             >
               {item.body}

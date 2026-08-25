@@ -5,6 +5,13 @@
  * them. This drives headless Chrome over the built site and fails the run when
  * a rule is broken.
  *
+ * Keep this file in step with the rules it checks. When home moved from the
+ * bento to the horizontal deck, rule 1 was rewritten but this was not, and the
+ * run reported forty failures for behaviour that had become the design — which
+ * is how a checker stops being run at all. The even-inset assertion was
+ * dropped at the same time: it keyed off `.frame`, which the deck does not
+ * have, so it had silently degraded to a no-op.
+ *
  *   npm run design              # against http://localhost:3000
  *   BASE=http://localhost:4321 npm run design
  *
@@ -142,19 +149,22 @@ const PROBE = `(() => {
     if (r < need) bad.push(String(el.className || el.tagName).split(' ')[0] + ' ' + r.toFixed(2) + ':1 @' + size + 'px');
   }
 
-  const frame = document.querySelector('.frame')?.getBoundingClientRect();
-  const vw = window.innerWidth, vh = window.innerHeight;
+  // Rule 1 is about one card being in focus, not about the absence of scroll:
+  // the deck's whole mechanism is vertical scroll driving horizontal travel.
+  const snapContainer = [...document.querySelectorAll('html, body, .hdeck, .hdeck__track')]
+    .map((el) => getComputedStyle(el).scrollSnapType)
+    .find((t) => t && t !== 'none') ?? 'none';
+  const snapStops = [...document.querySelectorAll('*')]
+    .filter((el) => { const a = getComputedStyle(el).scrollSnapAlign; return a && a !== 'none'; }).length;
+
+  const vw = window.innerWidth;
   return JSON.stringify({
     totalWords: words(document.body.innerText),
-    pageScrollY: document.documentElement.scrollHeight - document.documentElement.clientHeight,
     overflowX: document.documentElement.scrollWidth - vw,
     internalScrollers: scrollers,
     longest,
     contrast: [...new Set(bad)].slice(0, 8),
-    inset: frame ? {
-      top: Math.round(frame.top), left: Math.round(frame.left),
-      right: Math.round(vw - frame.right), bottom: Math.round(vh - frame.bottom),
-    } : null,
+    deck: { cards: document.querySelectorAll('.hcard').length, snapStops, snapContainer },
   });
 })()`;
 
@@ -168,9 +178,19 @@ for (const mode of ['light', 'dark']) {
       const r = JSON.parse(await evaluate(PROBE));
       const tag = `${route} @${width} ${mode}`;
 
-      // Rule 1 — one view on desktop.
-      if (r.pageScrollY > 0) fail(tag, 'one-view', `page scrolls ${r.pageScrollY}px`);
-      if (r.internalScrollers.length) fail(tag, 'one-view', `internal scroll: ${r.internalScrollers.join(', ')}`);
+      // Rule 1 — one card in focus. The deck is scroll-driven by design, so
+      // there is no assertion about scroll height; what has to hold is that
+      // every card is a snap stop, so exactly one can ever be centred. Detail
+      // views are editorial pages and scroll freely.
+      if (route === '/') {
+        if (!r.deck.cards) fail(tag, 'one-card-in-focus', 'deck rendered no cards');
+        if (!/mandatory/.test(r.deck.snapContainer)) {
+          fail(tag, 'one-card-in-focus', `snap is "${r.deck.snapContainer}", expected mandatory`);
+        }
+        if (r.deck.cards !== r.deck.snapStops) {
+          fail(tag, 'one-card-in-focus', `${r.deck.cards} cards but ${r.deck.snapStops} snap stops`);
+        }
+      }
 
       // Rule 3 — word budgets.
       const budget = WORD_BUDGET[route] ?? WORD_BUDGET.default;
@@ -180,12 +200,9 @@ for (const mode of ['light', 'dark']) {
       // Rule 7 — contrast.
       if (r.contrast.length) fail(tag, 'contrast-AA', r.contrast.join(', '));
 
-      // Standing invariants.
+      // Standing invariants. The deck translates its track rather than
+      // overflowing the document, so this still has to hold at every width.
       if (r.overflowX > 0) fail(tag, 'no-h-overflow', `${r.overflowX}px`);
-      if (r.inset) {
-        const v = Object.values(r.inset);
-        if (Math.max(...v) - Math.min(...v) > 1) fail(tag, 'even-inset', JSON.stringify(r.inset));
-      }
     }
   }
 
