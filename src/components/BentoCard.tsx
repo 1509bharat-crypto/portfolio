@@ -1,12 +1,10 @@
 'use client';
 
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cases, getCase } from '@/data/cases';
-import { springCrisp } from '@/lib/motion';
 import { CaseDetail } from './CaseDetail';
 import { HorizontalDeck } from './HorizontalDeck';
-import { LabGrid } from './LabGrid';
+import { LabView } from './LabView';
 import { StoryDetail } from './StoryDetail';
 
 type View =
@@ -20,42 +18,28 @@ function viewFromPath(path: string): View {
     const slug = path.slice('/work/'.length).replace(/\/$/, '');
     return getCase(slug) ? { kind: 'case', slug } : { kind: 'grid' };
   }
-  // A lab log lives inside the grid, so /lab/<slug> is still the lab view;
-  // LabGrid reads the slug off the URL and expands that box itself.
+  // A log lives inside the lab, so /lab/<slug> is still the lab view;
+  // LabView reads the slug off the URL and shows that log.
   if (path === '/lab' || path.startsWith('/lab/')) return { kind: 'lab' };
   if (path === '/story') return { kind: 'story' };
   return { kind: 'grid' };
 }
 
 /**
- * Home is the deck; each card is a dimension. Clicking a card grows it into a
- * full page out of the card's own rect: the card's surface becomes the page's
- * background, a lone back button sits on top, and closing shrinks it back into
- * its slot on the shelf.
+ * Home is the deck; clicking a card opens it as a full view.
  *
- * Stepping to the next project swaps the content inside the open dimension;
- * the dimension itself keeps the identity of the card it grew from, so Back
- * always returns to where you entered.
+ * There are no transition animations between views: a view is either up or it
+ * isn't. The deck's own scroll-driven motion stays, because that is the deck
+ * working rather than a page changing.
  *
  * The URL is kept in step with `history.pushState`; a cold load of
  * /work/<slug> is served by the real route instead.
  */
 export function BentoCard({ initialView }: { initialView?: View }) {
   const [view, setView] = useState<View>(initialView ?? { kind: 'grid' });
-  const reduced = useReducedMotion();
   const overlayRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastFocused = useRef<HTMLElement | null>(null);
-  /** -1 stepping back, 1 stepping forward, 0 opening fresh. */
-  const [dir, setDir] = useState(0);
-  /**
-   * The on-screen rect of the card the dimension grew out of, so it can grow
-   * from there and shrink back to it. A plain rect rather than a shared
-   * `layoutId`: the deck's track owns a scroll-driven `x`, and layout
-   * projection writes to that same transform, which left the track thousands
-   * of pixels adrift after a close.
-   */
-  const [origin, setOrigin] = useState<DOMRect | null>(null);
 
   const go = useCallback((next: View, path: string) => {
     if (typeof window !== 'undefined' && window.location.pathname !== path) {
@@ -65,52 +49,37 @@ export function BentoCard({ initialView }: { initialView?: View }) {
   }, []);
 
   const openCase = useCallback(
-    (slug: string, from?: DOMRect) => {
-      setDir(0);
-      if (from) setOrigin(from);
+    (slug: string) => {
       lastFocused.current = document.activeElement as HTMLElement;
       go({ kind: 'case', slug }, `/work/${slug}`);
     },
     [go],
   );
 
-  const openLab = useCallback(
-    (from?: DOMRect) => {
-      setDir(0);
-      if (from) setOrigin(from);
-      lastFocused.current = document.activeElement as HTMLElement;
-      go({ kind: 'lab' }, '/lab');
-    },
-    [go],
-  );
+  const openLab = useCallback(() => {
+    lastFocused.current = document.activeElement as HTMLElement;
+    go({ kind: 'lab' }, '/lab');
+  }, [go]);
 
   const openStory = useCallback(() => {
-    setDir(0);
     lastFocused.current = document.activeElement as HTMLElement;
     go({ kind: 'story' }, '/story');
   }, [go]);
 
   const close = useCallback(() => {
-    setDir(0);
-    // `origin` is intentionally kept: AnimatePresence renders the exiting
-    // dimension with its last props, and it needs the rect to shrink back to.
     go({ kind: 'grid' }, '/');
     lastFocused.current?.focus?.();
   }, [go]);
 
-  // Current position in each set, when a dimension is open.
   const study = view.kind === 'case' ? getCase(view.slug) : undefined;
   const caseIndex = study ? cases.findIndex((c) => c.slug === study.slug) : -1;
   const nextCase =
-    caseIndex >= 0 && caseIndex < cases.length - 1
-      ? cases[caseIndex + 1]
-      : undefined;
+    caseIndex >= 0 && caseIndex < cases.length - 1 ? cases[caseIndex + 1] : undefined;
   const prevCase = caseIndex > 0 ? cases[caseIndex - 1] : undefined;
 
   const stepCase = (delta: -1 | 1) => {
     const target = delta === -1 ? prevCase : nextCase;
     if (!target) return;
-    setDir(delta);
     go({ kind: 'case', slug: target.slug }, `/work/${target.slug}`);
   };
 
@@ -121,7 +90,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  // Escape climbs one level; arrow keys step within the open set.
+  // Escape closes; arrows step within the open set.
   useEffect(() => {
     if (view.kind === 'grid') return;
     const onKey = (e: KeyboardEvent) => {
@@ -138,11 +107,9 @@ export function BentoCard({ initialView }: { initialView?: View }) {
     return () => document.removeEventListener('keydown', onKey);
   });
 
-  // The deck must not scroll behind an open dimension, but its scroll
-  // position has to survive the trip: the morph back home aims at the card's
-  // on-shelf position, and `overflow: hidden` on the body would silently
-  // reset scroll to 0 and strand it. So block the input instead of collapsing
-  // the scroller; the dimension's own pane opts out via its ref.
+  // The deck must not scroll behind an open view, but its scroll position has
+  // to survive: `overflow: hidden` on the body would reset it to 0. So block
+  // the input instead of collapsing the scroller; the open view opts out.
   useEffect(() => {
     if (view.kind === 'grid') return;
     const block = (e: Event) => {
@@ -157,12 +124,10 @@ export function BentoCard({ initialView }: { initialView?: View }) {
     };
   }, [view.kind]);
 
-  // Focus the dimension's scroll pane so keyboard scrolling stays inside it
-  // instead of reaching the deck behind.
+  // Keyboard scrolling stays inside the open view.
   useEffect(() => {
     if (view.kind === 'grid') return;
-    const scroller =
-      overlayRef.current?.querySelector<HTMLElement>('.dim__scroll');
+    const scroller = overlayRef.current?.querySelector<HTMLElement>('.dim__scroll');
     (scroller ?? overlayRef.current)?.focus();
   }, [view.kind]);
 
@@ -172,48 +137,6 @@ export function BentoCard({ initialView }: { initialView?: View }) {
     scrollRef.current?.scrollTo({ top: 0 });
   }, [contentKey]);
 
-  const transition = reduced ? { duration: 0 } : springCrisp;
-
-  const swap = reduced
-    ? { initial: { opacity: 0 }, animate: { opacity: 1 } }
-    : {
-        initial: { opacity: 0, x: dir * 40, y: dir === 0 ? 8 : 0 },
-        animate: { opacity: 1, x: 0, y: 0 },
-      };
-
-  const fade = reduced
-    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
-    : {
-        initial: { opacity: 0, y: 10, scale: 0.99 },
-        animate: { opacity: 1, y: 0, scale: 1 },
-        exit: { opacity: 0, y: 6, scale: 0.995 },
-      };
-
-  /**
-   * Grow the dimension out of the card's rect and shrink it back to the same
-   * place. `.dim` is fixed at inset 0, so with a top-left origin a translate
-   * to the card's corner plus a uniform scale of card-width / viewport-width
-   * lands exactly on the card.
-   */
-  const grow =
-    reduced || !origin
-      ? fade
-      : (() => {
-          const at = {
-            opacity: 0,
-            x: origin.left,
-            y: origin.top,
-            scale: origin.width / window.innerWidth,
-          };
-          return {
-            initial: at,
-            animate: { opacity: 1, x: 0, y: 0, scale: 1 },
-            exit: at,
-          };
-        })();
-
-  const growStyle = { transformOrigin: 'top left' as const };
-
   return (
     <>
       <HorizontalDeck
@@ -222,92 +145,70 @@ export function BentoCard({ initialView }: { initialView?: View }) {
         onOpenStory={openStory}
       />
 
-      <AnimatePresence>
-        {study ? (
-          <motion.div
-            key="case-dim"
-            ref={overlayRef}
-            tabIndex={-1}
-            role="dialog"
-            aria-modal="true"
-            aria-label={`Case study: ${study.title}`}
-            className="dim"
-            style={growStyle}
-            transition={transition}
-            {...grow}
-          >
-            <div className="dim__bar">
-              <button className="wbtn dim__back" onClick={close}>
-                ← Back
-              </button>
-            </div>
-            <div className="dim__scroll" ref={scrollRef} tabIndex={-1}>
-              <motion.div key={study.slug} {...swap} transition={transition}>
-                <CaseDetail
-                  study={study}
-                  onNext={nextCase ? () => stepCase(1) : undefined}
-                  nextTitle={nextCase?.title}
-                />
-              </motion.div>
-            </div>
-          </motion.div>
-        ) : null}
+      {study ? (
+        <div
+          ref={overlayRef}
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Case study: ${study.title}`}
+          className="dim"
+        >
+          <div className="dim__bar">
+            <button
+              className="wbtn dim__back"
+              onClick={close}
+              aria-label="Back to the deck"
+            >
+              <span aria-hidden>←</span>
+            </button>
+          </div>
+          <div className="dim__scroll" ref={scrollRef} tabIndex={-1}>
+            <CaseDetail
+              study={study}
+              onNext={nextCase ? () => stepCase(1) : undefined}
+              nextTitle={nextCase?.title}
+            />
+          </div>
+        </div>
+      ) : null}
 
-        {view.kind === 'lab' ? (
-          <motion.div
-            key="lab-dim"
-            ref={overlayRef}
-            tabIndex={-1}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Lab"
-            className="dim"
-            style={growStyle}
-            transition={transition}
-            {...grow}
-          >
-            <div className="dim__bar">
-              <button className="wbtn dim__back" onClick={close}>
-                ← Back
-              </button>
-            </div>
-            <div className="dim__scroll" tabIndex={-1}>
-              <div className="dimbody">
-                <header className="dim__hero dim__hero--short">
-                  <span className="lab">Lab · open questions</span>
-                  <h1 className="dim__title">Experiments</h1>
-                </header>
-                <LabGrid />
-              </div>
-            </div>
-          </motion.div>
-        ) : null}
+      {view.kind === 'lab' ? (
+        <div
+          ref={overlayRef}
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Lab"
+          className="dim"
+        >
+          <LabView onExit={close} />
+        </div>
+      ) : null}
 
-        {view.kind === 'story' ? (
-          <motion.div
-            key="story-dim"
-            ref={overlayRef}
-            tabIndex={-1}
-            role="dialog"
-            aria-modal="true"
-            aria-label="The story"
-            className="dim"
-            transition={transition}
-            {...fade}
-          >
-            <div className="dim__bar">
-              <button className="wbtn dim__back" onClick={close}>
-                ← Back
-              </button>
-            </div>
-            <div className="dim__scroll" tabIndex={-1}>
-              <div className="dimbody">
-                <StoryDetail />
-              </div>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {view.kind === 'story' ? (
+        <div
+          ref={overlayRef}
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          aria-label="The story"
+          className="dim"
+        >
+          <div className="dim__bar">
+            <button
+              className="wbtn dim__back"
+              onClick={close}
+              aria-label="Back to the deck"
+            >
+              <span aria-hidden>←</span>
+            </button>
+          </div>
+          <div className="dim__scroll" tabIndex={-1}>
+            <StoryDetail />
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

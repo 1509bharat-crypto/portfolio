@@ -12,8 +12,8 @@ export default function StoryPage() {
   return (
     <div className="dimpage">
       <div className="dim__bar">
-        <Link className="wbtn dim__back" href="/">
-          ← Back
+        <Link className="wbtn dim__back" href="/" aria-label="Back to the deck">
+          <span aria-hidden>←</span>
         </Link>
       </div>
       <div className="dim__scroll">
