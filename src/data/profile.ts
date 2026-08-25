@@ -12,17 +12,19 @@ export const profile: Profile = {
   pitchParts: {
     lead: 'I design and build',
     /**
-     * Each is grounded in this repo: conversations from Mona, trust from
-     * Mona's "Trust & anonymity at enterprise scale", understanding from the
-     * story's "how do people and the things they use understand each other?",
-     * agents from De Wacht's voice agent. The first must match `pitch`. Add or
-     * reorder freely — the slot sizes itself to the longest.
+     * One phrase per project, and four different connectors so the line does
+     * not settle into a rhythm: conversations and trust from Mona (the second
+     * from its "Trust & anonymity at enterprise scale" block), agents from
+     * De Wacht's voice agent, workflows from Robin.
+     *
+     * The first must match `pitch`, which is what metadata and screen readers
+     * get. Add or reorder freely — the slot sizes itself to the longest.
      */
     rotating: [
       'conversations between',
       'trust across',
-      'understanding between',
       'agents linking',
+      'workflows for',
     ],
     tail: 'people and machines.',
   },
