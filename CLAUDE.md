@@ -30,7 +30,7 @@ Three levers carry the work: **typography, motion, visuals**. Text is the last r
 4. **Hierarchy before explanation.** If you can't tell what matters with the text blurred, the typography is doing too little and the copy too much. Fix the type, don't add a sentence.
 5. **Motion must inform.** Every animation says where something came from, what changed, or what is live. Bars draw because a wireframe rule gets drawn; the dot breathes because availability is the one live fact. No ambient decoration.
 6. **One accent.** The neutral ramp and hairlines do everything else. A second hue needs a reason.
-7. **AA in both themes.** `--line-strong` is a border value and fails as text; use `--numeral` for quiet type.
+7. **AA in both themes.** `--line-strong` is a border value and fails as text. `--numeral` is quiet type *on `--card`* — against the transparent ground it lands at 4.01:1, so use `--muted` there.
 8. **Reduced motion is respected** by every animation, via `useReducedMotion()` or the global media query.
 
 ## The wireframe owns the skeleton; the site owns the finish

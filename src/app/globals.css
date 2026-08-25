@@ -687,7 +687,10 @@ a {
 }
 
 .hdeck__hint {
-  color: var(--numeral);
+  /* Not --numeral: that value is calibrated against --card, and the pitch card
+     is transparent, so on the ground it lands at 4.01:1 and fails AA. The same
+     trap as --line-strong. --muted is the ground-safe quiet value. */
+  color: var(--muted);
 }
 
 .hcard__actions {
