@@ -731,14 +731,40 @@ a {
   padding: 14px;
 }
 
+/* One card owns the screen at a time, the same rule the desktop deck follows,
+   just down the page instead of across it. Each card is a snap stop, and it
+   dims and shrinks as it leaves the middle (that part is scroll-linked in
+   VerticalCard, not here). */
 .vdeck .hcard {
   width: auto;
   height: auto;
-  min-height: 320px;
+  min-height: 76svh;
+  scroll-snap-align: center;
+  /* The card is the surface; the button inside it carries the whole hit area. */
+  padding: 0;
+}
+
+.vdeck .hcard--surface {
+  padding: 0;
+}
+
+/* The card is a div now, so the tap target is a button filling it. */
+.vdeck__hit {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  padding: clamp(18px, 5vw, 30px);
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
 }
 
 .vdeck .hcard--pitch {
-  min-height: 55vh;
+  min-height: 62svh;
   padding: 24px 10px;
 }
 

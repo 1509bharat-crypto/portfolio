@@ -113,6 +113,63 @@ function DeckCard({
 }
 
 /**
+ * The same card on a phone, where the deck runs down instead of across. Focus
+ * is still positional: a card is fully present only while it owns the middle
+ * of the screen, and eases back as it leaves. The travel is native vertical
+ * scroll rather than a translated track, so each card reads its own progress.
+ */
+function VerticalCard({
+  item,
+  reduced,
+}: {
+  item: DeckItem;
+  reduced: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'end start'],
+  });
+
+  // A plateau rather than a single peak: the first and last card can never
+  // reach dead centre, since the page cannot scroll past its own ends, and a
+  // sharp peak left the landing card sitting at 0.84 before you touch it.
+  const opacity = useTransform(
+    scrollYProgress,
+    [0, 0.38, 0.62, 1],
+    [0.25, 1, 1, 0.25],
+  );
+  const scale = useTransform(
+    scrollYProgress,
+    [0, 0.38, 0.62, 1],
+    [0.94, 1, 1, 0.94],
+  );
+  const style = reduced ? { opacity } : { opacity, scale };
+  const className = `hcard ${item.className ?? ''}`;
+  const onClick = item.onClick;
+
+  return (
+    <motion.div ref={ref} style={style} className={className}>
+      {onClick ? (
+        <button
+          className="vdeck__hit"
+          onClick={(e) =>
+            onClick(
+              (ref.current ?? e.currentTarget).getBoundingClientRect(),
+            )
+          }
+          aria-label={item.ariaLabel}
+        >
+          {item.body}
+        </button>
+      ) : (
+        item.body
+      )}
+    </motion.div>
+  );
+}
+
+/**
  * Home as one horizontal run of viewport-sized cards. Vertical scroll drives
  * horizontal travel; full-height snap stops keep exactly one card in focus.
  * The whole track zooms out in proportion to scroll speed and springs back to
@@ -140,9 +197,9 @@ export function HorizontalDeck({
     return () => mq.removeEventListener('change', update);
   }, []);
 
-  // Full-viewport snap stops, only while the deck owns the page.
+  // Full-viewport snap stops, while the deck owns the page. Both axes want
+  // them: across on desktop, down on a phone.
   useEffect(() => {
-    if (!desktop) return;
     const root = document.documentElement;
     const prev = root.style.scrollSnapType;
     root.style.scrollSnapType = 'y mandatory';
@@ -255,22 +312,9 @@ export function HorizontalDeck({
   if (!desktop) {
     return (
       <div className="vdeck">
-        {items.map((item) =>
-          item.onClick ? (
-            <button
-              key={item.key}
-              className={`hcard ${item.className ?? ''}`}
-              onClick={(e) => item.onClick?.(e.currentTarget.getBoundingClientRect())}
-              aria-label={item.ariaLabel}
-            >
-              {item.body}
-            </button>
-          ) : (
-            <article key={item.key} className={`hcard ${item.className ?? ''}`}>
-              {item.body}
-            </article>
-          ),
-        )}
+        {items.map((item) => (
+          <VerticalCard key={item.key} item={item} reduced={!!reduced} />
+        ))}
       </div>
     );
   }
