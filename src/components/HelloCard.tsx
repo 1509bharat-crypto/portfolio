@@ -21,7 +21,6 @@ export function HelloCard({ onOpenStory }: { onOpenStory: () => void }) {
 
   return (
     <>
-      <span className="lab">{profile.story}</span>
       <p className="hpitch">Say hello.</p>
 
       <div className="hello__now">
