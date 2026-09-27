@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Bharat's CV. The site links the Google Drive copy (src/data/profile.ts), so
+# nothing here reads this file, and this repo is public.
+Bharat_CV_2026.docx
+
+# Wallpapers from the abandoned Ghibli direction. Third-party images, 1.4MB,
+# and nothing references them.
+/1198775-3200x1720-desktop-hd-studio-ghibli-wallpaper-photo.jpg
+/chihiro043.jpg
+/images.jpeg
+/totoro025.jpg

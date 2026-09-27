@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { CaseStudy } from '@/lib/types';
-import { BarLines, Placeholder } from './Primitives';
+import { BarLines, IconForward, Placeholder } from './Primitives';
 
 /**
  * The body of one case study, laid out editorially inside its dimension:
@@ -74,11 +74,11 @@ export function CaseDetail({
         )}
         {nextTitle && onNext ? (
           <button className="go" onClick={onNext}>
-            Next · {nextTitle} →
+            Next · {nextTitle} <IconForward />
           </button>
         ) : nextTitle && nextHref ? (
           <Link className="go" href={nextHref}>
-            Next · {nextTitle} →
+            Next · {nextTitle} <IconForward />
           </Link>
         ) : null}
       </footer>

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { lab } from '@/data/lab';
-import { BarLines, Placeholder } from './Primitives';
+import { BarLines, IconBack, Placeholder } from './Primitives';
 import { LabGrid } from './LabGrid';
 
 const getEntry = (slug: string) => lab.find((e) => e.slug === slug);
@@ -55,11 +55,11 @@ export function LabView({
 
   const exit = onExit ? (
     <button className="wbtn dim__back" onClick={onExit} aria-label="Back to the deck">
-      <span aria-hidden>←</span>
+      <IconBack />
     </button>
   ) : (
     <Link className="wbtn dim__back" href="/" aria-label="Back to the deck">
-      <span aria-hidden>←</span>
+      <IconBack />
     </Link>
   );
 
@@ -72,7 +72,7 @@ export function LabView({
             onClick={back}
             aria-label="Back to the experiments"
           >
-            <span aria-hidden>←</span>
+            <IconBack />
           </button>
         </div>
         <div className="dim__scroll">

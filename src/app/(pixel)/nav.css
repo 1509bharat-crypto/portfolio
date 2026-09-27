@@ -1,0 +1,201 @@
+/*
+ * The menu, on the pixel cover.
+ *
+ * Kept out of src/pixel/pixel.css on purpose: that file is Bharat's, vendored
+ * byte-for-byte, and nothing here may touch it. These rules borrow its tokens
+ * and sizes so the menu reads as part of the page rather than bolted to it.
+ *
+ * Open, it is a full-bleed paper panel, which is what #intro already does for
+ * the welcome letter. The first version was a dropdown, and a dropdown here is
+ * a filled rectangle laid over the portrait — the one thing the page is for.
+ * Taking the whole surface means nothing is ever half-covered.
+ *
+ * z-index 10 clears everything the source uses: grain sits at 9, the intro at
+ * 8, sound at 6, the trail at 3.
+ */
+.nav__toggle {
+  position: fixed;
+  top: clamp(28px, 7vh, 72px);
+  right: 20.5vw;
+  z-index: 11;
+  display: none;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  color: var(--ink-soft);
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+/* Revealed on `splashdone`, like the sound toggle — nothing appears over the
+   intro letter. */
+.nav__toggle.show {
+  display: block;
+}
+
+.nav__toggle:hover,
+.nav__toggle:focus-visible {
+  color: var(--ink);
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.nav__panel {
+  position: fixed;
+  /* Hung under the toggle, on the same inset. */
+  top: calc(clamp(28px, 7vh, 72px) + 2.2em);
+  right: 20.5vw;
+  z-index: 10;
+  min-width: 15em;
+  /* Paper, so nothing behind it shows through, and a hairline so it reads as
+     a sheet laid on the page. Four rows keep it well clear of the portrait. */
+  background: var(--paper);
+  border: 1px solid rgba(28, 26, 23, 0.14);
+  padding: 2.6em 1.4em 1.2em;
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+/* The panel closes itself, so the toggle can keep saying what it opens. */
+.nav__close {
+  position: absolute;
+  top: 0.7em;
+  right: 0.9em;
+  font: inherit;
+  line-height: 1;
+  color: var(--ink-soft);
+  background: none;
+  border: 0;
+  padding: 0.2em;
+  cursor: pointer;
+}
+
+.nav__close:hover,
+.nav__close:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.nav__group {
+  display: grid;
+  gap: 0.2em;
+}
+
+.nav__link {
+  /* Some entries are buttons (scene jumps) and some are links (routes); they
+     have to be indistinguishable. */
+  font: inherit;
+  background: none;
+  border: 0;
+  padding: 0.25em 0;
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2.4em;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* The chevron sits at the far end, quiet until the row is under the pointer,
+   where it takes that row's own colour. */
+.nav__chev {
+  color: var(--ink-soft);
+}
+
+/* The rule underlines the word, not the row — the chevron is a marker and
+   sits outside it. */
+.nav__link:hover,
+.nav__link:focus-visible {
+  outline: none;
+}
+
+.nav__link:hover .nav__t,
+.nav__link:focus-visible .nav__t {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.nav__link:hover .nav__chev,
+.nav__link:focus-visible .nav__chev {
+  color: var(--c);
+}
+
+@media (max-width: 900px) and (min-width: 641px) {
+  .nav__toggle {
+    right: 10.5vw;
+  }
+  .nav__panel {
+    right: 10.5vw;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav__toggle {
+    top: 7vw;
+    right: 14vw;
+  }
+  .nav__panel {
+    top: calc(7vw + 2.2em);
+    right: 14vw;
+    left: 14vw;
+    min-width: 0;
+  }
+}
+
+/*
+ * The scene label, set above whatever the current scene lays out.
+ *
+ * It was a fixed corner first, with an "01 / 05" counter, and read as a
+ * caption for the page rather than a heading for the content. SceneLabel
+ * measures the active scene's container and puts this at its top-left, so it
+ * belongs to the thing beneath it.
+ *
+ * Hidden on a phone, where the source turns the scenes into one continuous
+ * scroll and the measured position would be wrong.
+ */
+.scene {
+  position: fixed;
+  z-index: 6;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  pointer-events: none;
+  /* No transition. It mounts once its scene has finished arriving and
+     unmounts on the frame that scene leaves — a hard cut, like every other
+     element on this page. The cover runs at 8fps on a 125ms grid and nothing
+     in it fades, so a fading label read as belonging to a different site. */
+}
+
+@media (max-width: 640px) {
+  .scene {
+    display: none;
+  }
+}
+
+/*
+ * The work tiles are links now, so the scene is a way into the projects. The
+ * anchor has to disappear entirely into the tile: the source styles `.wb
+ * canvas` and `.wb p` directly, and inherits its colour from the page.
+ */
+.wb__a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.wb__a:hover .c,
+.wb__a:focus-visible .c {
+  color: var(--ink);
+}
+
+.wb__a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 6px;
+}

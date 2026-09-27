@@ -1,0 +1,320 @@
+/*
+ * Project pages, built from the editorial layouts Bharat referenced.
+ *
+ * What those share — a campaign timeline, two Japanese editorial sites, a
+ * newspaper spread and a study poster — is a spine with entries hung
+ * alternately off it, small labels rather than big numerals, and far more
+ * empty paper than content. An earlier version of this file laid the
+ * decisions out as four equal columns in one row, which is the opposite: a
+ * tidy table, read left to right, with nothing to follow.
+ *
+ * Paper, ink and Archivo come from src/pixel/pixel.css, which the layout
+ * above already loads, grain included. Margins and the corner furniture sit
+ * on the cover's 20.5vw insets so the two pages share a page edge.
+ */
+.cs {
+  padding: clamp(84px, 14vh, 180px) 20.5vw clamp(120px, 20vh, 260px);
+  font-size: clamp(12.5px, 0.78vw, 17.5px);
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+/*
+ * Element reset, at zero specificity.
+ *
+ * Written as `.cs p` it scored 0,1,1 and beat every single-class rule below
+ * it, so `margin: 0` silently won over each `.cs__*` margin — the whole page
+ * collapsed to one rhythm and the section label sat on the axis. `:where()`
+ * contributes nothing, so the classes decide.
+ */
+:where(.cs) :where(p, h1, h2, ol, ul) {
+  margin: 0;
+  font-size: inherit;
+  font-weight: 400;
+}
+
+/* ---------- masthead ---------- */
+
+.cs__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 2.6em;
+  align-items: start;
+  padding-bottom: 7.2em;
+}
+
+.cs__title {
+  font-size: clamp(22px, 2vw, 38px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.cs__kicker,
+.cs__label {
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.cs__lede {
+  margin-top: 1.45em;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+/* ---------- the decisions, hung off a spine ---------- */
+
+/* The label and a rule running out from it, as the references set theirs. */
+.cs__label {
+  display: flex;
+  align-items: center;
+  gap: 1.45em;
+}
+
+.cs__label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--ink);
+  opacity: 0.22;
+}
+
+.cs__tl {
+  position: relative;
+  margin-top: 5.8em;
+  padding: 0;
+  list-style: none;
+}
+
+/* The spine. Every decision hangs off this one line. */
+.cs__tl::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: var(--ink);
+  opacity: 0.22;
+}
+
+.cs__stop {
+  position: relative;
+  box-sizing: border-box;
+  width: 50%;
+  padding-right: 3.6em;
+  text-align: right;
+}
+
+.cs__stop + .cs__stop {
+  margin-top: 5.2em;
+}
+
+/* Alternating sides, so reading runs down the spine rather than across. */
+.cs__stop:nth-child(even) {
+  margin-left: 50%;
+  padding-right: 0;
+  padding-left: 3.6em;
+  text-align: left;
+}
+
+/* The marker on the spine. Square, like everything the cover draws. */
+.cs__stop::before {
+  content: '';
+  position: absolute;
+  top: 0.3em;
+  width: 7px;
+  height: 7px;
+  background: var(--ink);
+  z-index: 1;
+}
+
+.cs__stop:nth-child(odd)::before {
+  right: -3px;
+}
+
+.cs__stop:nth-child(even)::before {
+  left: -3px;
+}
+
+/* The tick from the marker back to its text. */
+.cs__stop::after {
+  content: '';
+  position: absolute;
+  top: calc(0.3em + 3px);
+  width: 2.2em;
+  height: 1px;
+  background: var(--ink);
+  opacity: 0.22;
+}
+
+.cs__stop:nth-child(odd)::after {
+  right: 4px;
+}
+
+.cs__stop:nth-child(even)::after {
+  left: 4px;
+}
+
+/* A quiet label, the way the references date their entries — not an anchor. */
+.cs__n {
+  display: block;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-variant-numeric: tabular-nums;
+}
+
+.cs__t {
+  margin-top: 1.1em;
+  font-size: clamp(16px, 1.32vw, 25px);
+  font-weight: 400;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+}
+
+/* Justified on both sides — right-ragged body text at this length is a chore
+   to read, and the references set their paragraphs justified anyway. */
+.cs__b {
+  margin-top: 1.1em;
+  color: var(--ink-soft);
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+/* ---------- figures, as a ruled band ---------- */
+
+.cs__stats {
+  margin-top: 7.2em;
+  padding: 1.45em 0 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.6em;
+  border-top: 1px solid var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.cs__stat b {
+  font-size: clamp(19px, 1.7vw, 32px);
+  font-weight: 500;
+  line-height: 1;
+  display: block;
+}
+
+.cs__stat span {
+  display: block;
+  margin-top: 0.6em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* ---------- the foot, set in the corners over a rule ---------- */
+
+.cs__foot {
+  margin-top: 7.2em;
+  padding-top: 1.45em;
+  border-top: 1px solid var(--ink);
+  display: flex;
+  justify-content: space-between;
+  gap: 2.6em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* ---------- the fixed corners, on the cover's insets ---------- */
+
+.cs__home {
+  position: fixed;
+  top: clamp(28px, 7vh, 72px);
+  left: 20.5vw;
+  z-index: 11;
+  font-size: 12px;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.cs__home:hover,
+.cs__home:focus-visible {
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cs__home:hover {
+  color: var(--ink);
+}
+
+@media (min-width: 1600px) {
+  .cs {
+    font-size: clamp(15px, 0.88vw, 21px);
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 641px) {
+  .cs {
+    padding-left: 10.5vw;
+    padding-right: 10.5vw;
+  }
+  .cs__head {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2.9em;
+  }
+  .cs__home {
+    left: 10.5vw;
+  }
+}
+
+/* One column, spine on the left: two half-columns of justified text at this
+   width would be four or five words a line. */
+@media (max-width: 640px) {
+  .cs {
+    padding: 26vw 14vw 24vw;
+    font-size: 15px;
+  }
+  .cs__home {
+    top: 7vw;
+    left: 14vw;
+  }
+  .cs__head {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2.6em;
+    padding-bottom: 4.3em;
+  }
+  .cs__tl::before {
+    left: 3px;
+  }
+  .cs__stop,
+  .cs__stop:nth-child(even) {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 2.6em;
+    padding-right: 0;
+    text-align: left;
+  }
+  .cs__stop + .cs__stop {
+    margin-top: 3.6em;
+  }
+  .cs__stop::before,
+  .cs__stop:nth-child(even)::before {
+    left: 0;
+    right: auto;
+  }
+  .cs__stop::after,
+  .cs__stop:nth-child(even)::after {
+    left: 7px;
+    right: auto;
+    width: 1.4em;
+  }
+  .cs__foot {
+    display: block;
+  }
+  .cs__foot > * + * {
+    margin-top: 0.9em;
+  }
+}

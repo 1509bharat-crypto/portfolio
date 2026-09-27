@@ -1,8 +1,5 @@
 import type { Profile } from '@/lib/types';
 
-// TODO(bharat): the email and the resume PDF still need real values.
-// /resume.pdf does not exist yet, so that button 404s until it's added
-// to the public/ directory.
 export const profile: Profile = {
   name: 'Bharat Bharat',
   role: 'Product designer',
@@ -12,20 +9,14 @@ export const profile: Profile = {
   pitchParts: {
     lead: 'I design and build',
     /**
-     * One phrase per project, and four different connectors so the line does
-     * not settle into a rhythm: conversations and trust from Mona (the second
-     * from its "Trust & anonymity at enterprise scale" block), agents from
-     * De Wacht's voice agent, workflows from Robin.
+     * One phrase per project, each with its own connector so the line does not
+     * settle into a rhythm: conversations from Mona, agents from De Wacht's
+     * voice agent, workflows from Robin.
      *
      * The first must match `pitch`, which is what metadata and screen readers
      * get. Add or reorder freely — the slot sizes itself to the longest.
      */
-    rotating: [
-      'conversations between',
-      'trust across',
-      'agents linking',
-      'workflows for',
-    ],
+    rotating: ['conversations between', 'agents linking', 'workflows for'],
     tail: 'people and machines.',
   },
   disciplines: [
@@ -64,8 +55,11 @@ export const profile: Profile = {
     what: 'AI recruiting workflows.',
   },
   links: [
-    { label: 'Email', href: 'mailto:hello@bharatbharat.co' },
+    { label: 'Email', href: 'mailto:1509bharat@gmail.com' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/1509bharat/' },
-    { label: 'Resume', href: '/resume.pdf' },
+    {
+      label: 'Resume',
+      href: 'https://drive.google.com/file/d/1KzpLuAbGfLJfrDGJG1XUwKW9K-M6cm7L/view?usp=sharing',
+    },
   ],
 };

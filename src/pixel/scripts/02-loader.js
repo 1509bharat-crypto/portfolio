@@ -1,0 +1,23 @@
+(function(){
+const L=document.getElementById('loader'),cv=document.getElementById('ld'),x=cv.getContext('2d'),out=document.getElementById('pct');
+const P=['#E63312','#1F4DB7','#F2C114','#2E9E4F','#F07D1C','#D63A8E','#2FA8D8','#6B3FA0'];
+const BP=[[4,0],[3,0],[2,0],[1,0],[0,0],[0,1],[0,2],[0,3],[1,4],[2,3],[3,4],[4,3],[4,2],[4,1],[2,2],[2,1]];
+const LINK=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],[11,12],[12,13]];
+const INK=[[P[0],P[4]],[P[1],P[6]]];
+let k=0,level=0,filling=true;const gone=new Set();
+const draw=()=>{x.clearRect(0,0,110,50);
+ [0,1].forEach(L=>{const ox=L*60,h=(k+L*8)%16,t=(h+15)%16;BP.forEach(([r,c],i)=>{if(r<5-level||gone.has(L*16+i))return;x.fillStyle=(i===h||i===t)?INK[L][0]:INK[L][1];x.fillRect(ox+c*10,r*10,10,10)})});
+ k++;if(filling){window.__blip&&window.__blip(Math.floor(Math.random()*8),0,Math.floor(Math.random()*3));level++;if(level>=5){level=5;filling=false}}};
+let anim=null,t0=0;const MIN=1400;let target=15,shown=0,finished=false;
+const bump=v=>{target=Math.max(target,v)};
+if(document.readyState!=='loading')bump(60);else document.addEventListener('DOMContentLoaded',()=>bump(60));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>bump(85));
+if(document.readyState==='complete')bump(100);else addEventListener('load',()=>bump(100));
+const finish=()=>{if(finished)return;finished=true;filling=false;
+ clearInterval(anim);let txt=out.textContent;const drain=setInterval(()=>{window.__blip&&window.__blip(Math.floor(Math.random()*8),0,Math.floor(Math.random()*3));level--;txt=txt.slice(0,-1);out.textContent=txt;draw();if(level<=0){clearInterval(drain);x.clearRect(0,0,110,50);out.textContent='';
+  setTimeout(()=>{L.remove();window.__splashDone=true;dispatchEvent(new Event('splashdone'))},125)}},125)};
+const tick=()=>{const cap=Math.min(100,((performance.now()-t0)/MIN)*100);const goal=Math.min(target,cap);shown+=Math.max(4,(goal-shown)*0.35);if(shown>goal)shown=goal;out.textContent=Math.round(shown)+'%';
+ if(Math.round(shown)>=100){setTimeout(finish,500);return}setTimeout(tick,125)};
+const begin=()=>{t0=performance.now();draw();anim=setInterval(draw,125);setTimeout(tick,125)};
+if(window.__introDone)begin();else addEventListener('introdone',begin,{once:true});
+})();

@@ -1,7 +1,7 @@
 'use client';
 
 import { lab, labSlots } from '@/data/lab';
-import { Label, Placeholder } from './Primitives';
+import { IconForward, Label, Placeholder } from './Primitives';
 
 /** The grid of experiments. Clicking one opens its log in the lab page. */
 export function LabGrid({ onOpen }: { onOpen: (slug: string) => void }) {
@@ -17,7 +17,7 @@ export function LabGrid({ onOpen }: { onOpen: (slug: string) => void }) {
           <span className="cellhead">
             <Label>{entry.category}</Label>
             <span className="csnum" aria-hidden>
-              →
+              <IconForward />
             </span>
           </span>
           <Placeholder />

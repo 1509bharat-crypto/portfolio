@@ -5,12 +5,18 @@
  * them. This drives headless Chrome over the built site and fails the run when
  * a rule is broken.
  *
- * Keep this file in step with the rules it checks. When home moved from the
- * bento to the horizontal deck, rule 1 was rewritten but this was not, and the
- * run reported forty failures for behaviour that had become the design — which
- * is how a checker stops being run at all. The even-inset assertion was
- * dropped at the same time: it keyed off `.frame`, which the deck does not
- * have, so it had silently degraded to a no-op.
+ * Keep this file in step with the rules it checks. Twice now it has fallen
+ * behind and started reporting failures for behaviour that had become the
+ * design — first when home moved from the bento to the deck, then when the
+ * deck was deleted and this still listed /deck, /story and /lab, so every run
+ * failed on four missing routes. That is how a checker stops being run at all.
+ *
+ * What it can still assert is what is true of any page: contrast and
+ * horizontal overflow. "One card in focus" and the word budgets described a
+ * deck that no longer exists, and the cover is a different design served
+ * verbatim — book-set justified paragraphs, no cards, no snap. Measuring it
+ * against those would test the wrong thing, so they are gone rather than
+ * scoped to nothing.
  *
  *   npm run design              # against http://localhost:3000
  *   BASE=http://localhost:4321 npm run design
@@ -26,12 +32,18 @@ const CHROME =
 const BASE = process.env.BASE ?? 'http://localhost:3000';
 const PORT = 9455;
 
-/** Every route that must obey the rules. */
-const ROUTES = ['/', '/work/lisa-mona', '/story', '/lab', '/lab/de-wacht', '/nope'];
-
-/** Rule 3 — word budgets. Home carries the pitch, so it gets more room. */
-const WORD_BUDGET = { '/': 160, default: 120 };
-const BLOCK_BUDGET = 25;
+/**
+ * Every route that must obey the rules: the cover, one project page of each
+ * shape — five decisions with bodies, four title-only, two and no stats — and
+ * the 404.
+ */
+const ROUTES = [
+  '/',
+  '/work/lisa',
+  '/work/robin-jr',
+  '/work/ai-adoption',
+  '/nope',
+];
 
 /** Widths the rules are checked at. */
 const DESKTOP = [1280, 1440, 1728, 1920, 2560];
@@ -194,30 +206,11 @@ for (const mode of ['light', 'dark']) {
       const r = JSON.parse(await evaluate(PROBE));
       const tag = `${route} @${width} ${mode}`;
 
-      // Rule 1 — one card in focus. The deck is scroll-driven by design, so
-      // there is no assertion about scroll height; what has to hold is that
-      // every card is a snap stop, so exactly one can ever be centred. Detail
-      // views are editorial pages and scroll freely.
-      if (route === '/') {
-        if (!r.deck.cards) fail(tag, 'one-card-in-focus', 'deck rendered no cards');
-        if (!/mandatory/.test(r.deck.snapContainer)) {
-          fail(tag, 'one-card-in-focus', `snap is "${r.deck.snapContainer}", expected mandatory`);
-        }
-        if (r.deck.cards !== r.deck.snapStops) {
-          fail(tag, 'one-card-in-focus', `${r.deck.cards} cards but ${r.deck.snapStops} snap stops`);
-        }
-      }
-
-      // Rule 3 — word budgets.
-      const budget = WORD_BUDGET[route] ?? WORD_BUDGET.default;
-      if (r.totalWords > budget) fail(tag, 'word-budget', `${r.totalWords} words > ${budget}`);
-      if (r.longest.words > BLOCK_BUDGET) fail(tag, 'block-budget', `${r.longest.words}w "${r.longest.text}"`);
-
       // Rule 7 — contrast.
       if (r.contrast.length) fail(tag, 'contrast-AA', r.contrast.join(', '));
 
-      // Standing invariants. The deck translates its track rather than
-      // overflowing the document, so this still has to hold at every width.
+      // The cover is exactly one viewport wide and the project pages scroll
+      // only downwards, so nothing may ever overflow sideways.
       if (r.overflowX > 0) fail(tag, 'no-h-overflow', `${r.overflowX}px`);
     }
   }

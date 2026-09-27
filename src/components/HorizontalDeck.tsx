@@ -11,11 +11,12 @@ import {
 } from 'motion/react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { flagship, otherCases, primaryCases } from '@/data/cases';
+import { also, columns } from '@/data/intro';
 import { lab, labIntro } from '@/data/lab';
 import { profile } from '@/data/profile';
 import type { CaseStudy } from '@/lib/types';
 import { HelloCard } from './HelloCard';
-import { Label, Placeholder } from './Primitives';
+import { IconForward, Label, Placeholder } from './Primitives';
 import { RotatingWord } from './RotatingWord';
 
 /** Card width (70vw) plus the gap between cards (4vw). */
@@ -220,9 +221,12 @@ export function HorizontalDeck({
       className: 'hcard--pitch',
       body: (
         <>
-          <span className="lab">
-            {profile.name} · {profile.role} · {profile.location}
-          </span>
+          <div className="whois">
+            <p className="whois__name">{profile.name}</p>
+            <p className="lab whois__role">
+              {profile.role} · {profile.location}
+            </p>
+          </div>
           <p className="hpitch">
             {/* The sentence a screen reader gets, without the rotation. */}
             <span className="sr-only">{profile.pitch}</span>
@@ -234,8 +238,17 @@ export function HorizontalDeck({
               <span className="hpitch__line">{profile.pitchParts.tail}</span>
             </span>
           </p>
+          <div className="cover__cols">
+            {columns.map((col) => (
+              <div className="cover__col" key={col.label}>
+                <span className="lab">{col.label}</span>
+                <p>{col.body}</p>
+              </div>
+            ))}
+          </div>
+          <p className="cover__also">{also}</p>
           <span className="lab hdeck__hint" aria-hidden>
-            scroll →
+            scroll <IconForward />
           </span>
         </>
       ),
@@ -255,19 +268,39 @@ export function HorizontalDeck({
     })),
     {
       key: 'others',
-      className: 'hcard--surface',
-      ariaLabel: 'Open other case studies',
-      onClick: (origin: DOMRect) => onOpenCase(otherCases[0].slug, origin),
+      className: 'hcard--surface hcard--more',
+      /*
+       * No onClick, deliberately. This card used to be one big button that
+       * opened whichever case happened to be first, which meant a card
+       * promising seven studies delivered one, with no way to see the rest.
+       *
+       * `cases.ts` always said what this should be: rank 'other' entries
+       * "become rows in the other case studies tile". Rows need their own
+       * buttons, and a button cannot live inside a button — so the card drops
+       * its own click and DeckCard renders it as an article instead.
+       */
       body: (
         <>
           <div className="cellhead">
             <Label>Other case studies</Label>
-            <span className="csnum">{`${otherCases[0]?.number}+`}</span>
+            <span className="csnum">{otherCases.length}</span>
           </div>
-          <p className="headline">
-            {otherCases.map((c) => c.title).join(' · ')} →
-          </p>
-          <Placeholder className="flex-1" />
+          <ul className="morelist">
+            {otherCases.map((study) => (
+              <li key={study.slug}>
+                <button
+                  className="morerow"
+                  onClick={() => onOpenCase(study.slug)}
+                  aria-label={`Open case study: ${study.title}`}
+                >
+                  <span className="csnum morerow__no">{study.number}</span>
+                  <span className="morerow__title">{study.title}</span>
+                  <span className="lab morerow__co">{study.company}</span>
+                  <IconForward />
+                </button>
+              </li>
+            ))}
+          </ul>
         </>
       ),
     },

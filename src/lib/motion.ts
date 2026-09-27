@@ -19,6 +19,23 @@ export const springLayout = {
   mass: 0.9,
 };
 
+/**
+ * A press that bounces back. Underdamped on purpose, unlike the two above:
+ * critical damping here is 2·√(420 × 0.8) ≈ 36.7, so 14 lands at a ratio of
+ * about 0.38, which overshoots by roughly a quarter of the travel. At 22
+ * (ratio 0.6) the overshoot measured under half a pixel on the cursor and
+ * read as no bounce at all.
+ *
+ * Integrated by hand in `Cursor`, which runs its own rAF loop rather than
+ * going through Motion.
+ */
+export const springBounce = {
+  type: 'spring' as const,
+  stiffness: 420,
+  damping: 14,
+  mass: 0.8,
+};
+
 /** Non-spring moves: drawing a bar, collapsing a panel. */
 export const easeOut = [0.22, 1, 0.36, 1] as const;
 

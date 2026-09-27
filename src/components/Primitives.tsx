@@ -1,10 +1,34 @@
 import type { ReactNode } from 'react';
+import ArrowBack from '@material-symbols/svg-600/rounded/arrow_back.svg';
+import ArrowForward from '@material-symbols/svg-600/rounded/arrow_forward.svg';
 
 /**
  * The wireframe vocabulary, as components. These are what keep the built site
  * reading like the locked skeleton: crossed boxes stand in for imagery, bars
  * stand in for copy that hasn't been written yet.
  */
+
+/**
+ * The two directional icons, Material Symbols Rounded at weight 600.
+ *
+ * The weight is why the package is `@material-symbols/svg-600` and not the
+ * classic `@material-design-icons/svg`: the classic set has a rounded style
+ * but no weight axis, so it only ships the equivalent of 400. This family
+ * pre-renders Symbols per axis, which keeps the icons as static files with no
+ * icon font to load.
+ *
+ * Both are `aria-hidden`: every place they appear, the button or link already
+ * carries an `aria-label` or visible text, so announcing the arrow as well
+ * would just be noise. They size to 1em and inherit `currentColor`, which is
+ * what the `←` and `→` characters they replaced did for free.
+ */
+export function IconBack() {
+  return <ArrowBack className="icon" aria-hidden focusable="false" />;
+}
+
+export function IconForward() {
+  return <ArrowForward className="icon" aria-hidden focusable="false" />;
+}
 
 export function Placeholder({ className = '' }: { className?: string }) {
   return <div className={`ph ${className}`} aria-hidden />;

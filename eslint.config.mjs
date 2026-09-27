@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Bharat's pixel page, vendored byte-for-byte by scripts/extract-pixel.mjs.
+    // It is never hand-edited, so warnings about it are unactionable.
+    "src/pixel/**",
   ]),
 ]);
 

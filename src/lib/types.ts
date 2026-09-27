@@ -30,6 +30,8 @@ export type CaseStudy = {
   number: string;
   rank: CaseRank;
   kicker: string;
+  /** The year the pixel cover prints after the title: "Robin Jr., 2026". */
+  year?: string;
   title: string;
   /**
    * The name a recruiter would recognise — the company or the shipped product,

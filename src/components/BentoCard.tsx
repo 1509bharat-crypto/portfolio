@@ -6,6 +6,7 @@ import { CaseDetail } from './CaseDetail';
 import { HorizontalDeck } from './HorizontalDeck';
 import { LabView } from './LabView';
 import { StoryDetail } from './StoryDetail';
+import { IconBack } from './Primitives';
 
 type View =
   | { kind: 'grid' }
@@ -160,7 +161,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
               onClick={close}
               aria-label="Back to the deck"
             >
-              <span aria-hidden>←</span>
+              <IconBack />
             </button>
           </div>
           <div className="dim__scroll" ref={scrollRef} tabIndex={-1}>
@@ -201,7 +202,7 @@ export function BentoCard({ initialView }: { initialView?: View }) {
               onClick={close}
               aria-label="Back to the deck"
             >
-              <span aria-hidden>←</span>
+              <IconBack />
             </button>
           </div>
           <div className="dim__scroll" tabIndex={-1}>

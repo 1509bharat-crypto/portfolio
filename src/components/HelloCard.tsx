@@ -1,6 +1,7 @@
 import { stack } from '@/data/cases';
 import { profile } from '@/data/profile';
 import { Availability, IdentityLinks } from './Identity';
+import { IconForward } from './Primitives';
 
 /**
  * The last card of the deck: everything someone needs once they have decided
@@ -62,7 +63,7 @@ export function HelloCard({ onOpenStory }: { onOpenStory: () => void }) {
       <div className="hello__foot">
         <IdentityLinks />
         <button className="go" onClick={onOpenStory}>
-          Read the story →
+          Read the story <IconForward />
         </button>
       </div>
     </>
