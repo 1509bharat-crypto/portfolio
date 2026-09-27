@@ -227,9 +227,11 @@
   letter-spacing: 0.12em;
 }
 
+/* Sits above the head band rather than inside a column, so the title and the
+   standfirst still start on the same line. */
 .cs__back {
   display: inline-block;
-  margin-top: 4.3em;
+  margin-bottom: 2.9em;
   color: var(--ink-soft);
   text-decoration: none;
 }

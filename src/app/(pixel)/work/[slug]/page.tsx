@@ -60,6 +60,12 @@ export default async function CasePage({ params }: Props) {
       </a>
 
       <article className="cs">
+        {/* The corner mark goes home, which is the first scene. This goes back
+            to the tiles you came from. */}
+        <a className="cs__back" href="/?scene=3">
+          ← Selected work
+        </a>
+
         {/* Title on the left, the standfirst as its own column on the right.
             Before, the standfirst was one narrow measure adrift at the top of
             an otherwise full-width page. */}
