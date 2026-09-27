@@ -114,10 +114,22 @@ The cover sets them and the project pages follow.
 - **OG images are rendered by Satori, not a browser.** It supports a CSS subset: flex only, and any
   element with more than one child needs an explicit `display`. JSX counts each text fragment as a
   child, so `{a}, {b}` is three children — interpolate once instead.
+- **Links to `/` are plain `<a>`, never `next/link`.** A client-side navigation injects the cover's
+  markup through React, which does not execute script tags, so the cover arrives dead — no `ready`
+  class, no scenes. It has to be a document load. `@next/next/no-html-link-for-pages` is turned off
+  for `src/app/(pixel)/**` for exactly this, with the reason in `eslint.config.mjs`.
+- **A menu entry off the cover links to `/?scene=n`.** The cover always opens on the first scene, so
+  `PixelNav` reads that param once the intro is done, calls `__go`, and clears it from the URL.
+  Without it every entry landed on About and a project page was a dead end.
 - **`SceneLabel` measures at reveal time, not at transition time.** A scene is empty until its own
   contents start arriving, so measuring when the body class changes reads a zero-height box. It
   watches the scene's subtree and shows once that has been quiet for longer than one 125ms step —
   which is also why it does not restate any of the script's timings.
+- **It counts `on` being *added*, and nothing else.** Two traps, both of which produced a visible
+  bug. The scattered words blink a `lit` class ten times a second, so counting every class change
+  meant that scene never read as settled. And a scene leaving removes `on` from everything it owns —
+  counting those armed the clock on the way out, and since every `hide` strips its own scene class,
+  leaving `body="ready s2"`, the label flashed "Skills" partway through every transition.
 - **`next dev` rewrites the `AGENTS.md` block** at the top of this file's import. Commit that churn
   with your work rather than reverting it.
 

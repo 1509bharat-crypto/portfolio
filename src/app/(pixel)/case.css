@@ -227,6 +227,21 @@
   letter-spacing: 0.12em;
 }
 
+.cs__back {
+  display: inline-block;
+  margin-top: 4.3em;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.cs__back:hover,
+.cs__back:focus-visible {
+  outline: none;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* ---------- the fixed corners, on the cover's insets ---------- */
 
 .cs__home {

@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { cases, getCase } from '@/data/cases';
 import '../../case.css';
@@ -24,6 +23,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+/*
+ * Links to `/` are plain anchors, never `next/link`.
+ *
+ * The cover is a vendored HTML string with six inline scripts that run as the
+ * document parses. A client-side navigation injects that markup through React
+ * instead, which does not execute script tags, so the cover arrives dead — no
+ * `ready` class, no scenes, nothing. It has to be a document load.
+ */
+
 /**
  * One project, set as an editorial page rather than a case study template.
  *
@@ -47,9 +55,9 @@ export default async function CasePage({ params }: Props) {
 
   return (
     <>
-      <Link className="cs__home" href="/">
+      <a className="cs__home" href="/">
         Bharat
-      </Link>
+      </a>
 
       <article className="cs">
         {/* Title on the left, the standfirst as its own column on the right.
@@ -97,6 +105,12 @@ export default async function CasePage({ params }: Props) {
             <p>{study.year ?? ''}</p>
           </footer>
         ) : null}
+
+        {/* The corner mark goes home, which is the first scene. This goes back
+            to the tiles you came from. */}
+        <a className="cs__back" href="/?scene=3">
+          ← Selected work
+        </a>
 
       </article>
     </>

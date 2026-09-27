@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
@@ -13,12 +12,18 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
  *
  * Jumping scenes uses `window.__go`, which `scripts/extract-pixel.mjs`
  * publishes from the scenes script — the one line in src/pixel/ that is not
- * verbatim. Off the cover there is nothing to drive, so the scene entries
- * become links home.
+ * verbatim. Off the cover there is nothing to drive yet, so the entries link
+ * to `/?scene=n` and the cover makes the jump once its intro is out of the
+ * way. Without that every entry landed on the first scene, so a project page
+ * was a dead end: the menu offered Work and did not go there.
  *
  * It lives here rather than in `src/pixel/` because that directory is the
  * source file, vendored and never hand-edited. The menu is a sibling of it,
  * using its tokens, so the page underneath stays as Bharat made it.
+ *
+ * Off the cover the entries are plain anchors, not `next/link`: a client-side
+ * navigation injects the cover's markup through React, which does not run its
+ * inline scripts, and it arrives dead.
  */
 
 /** The source file's palette, one colour per link. */
@@ -73,6 +78,17 @@ export function PixelNav() {
   );
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  // Arriving from `/?scene=n`. The cover always opens on the first scene, so
+  // the jump has to wait for the intro to finish.
+  useEffect(() => {
+    if (!onCover || !splash) return;
+    const to = Number(new URLSearchParams(location.search).get('scene'));
+    if (!Number.isInteger(to) || to < 1 || to > 4) return;
+    window.__go?.(to);
+    // A clean URL, so a reload or a shared link does not replay the jump.
+    history.replaceState(null, '', location.pathname);
+  }, [onCover, splash]);
 
   // On the cover the toggle waits for the loader, like the sound button.
   // Everywhere else there is no loader to wait for.
@@ -139,9 +155,9 @@ export function PixelNav() {
                   </span>
                 </button>
               ) : (
-                <Link
+                <a
                   key={name}
-                  href="/"
+                  href={scene === 0 ? '/' : `/?scene=${scene}`}
                   className="nav__link"
                   style={colour()}
                   onClick={() => setOpen(false)}
@@ -150,7 +166,7 @@ export function PixelNav() {
                   <span className="nav__chev" aria-hidden>
                     ›
                   </span>
-                </Link>
+                </a>
               ),
             )}
           </div>

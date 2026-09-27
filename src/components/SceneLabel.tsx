@@ -96,15 +96,21 @@ export function SceneLabel() {
      * Watches the active scene only. A body-level observer cannot do this job:
      * it sees the scene classes themselves, which change before the content.
      *
-     * Only `on` counts. The scattered words carry an `<i>` pixel that blinks a
-     * `lit` class about ten times a second for as long as that scene is up, so
-     * counting every class change meant the skills scene never went quiet and
-     * its label appeared only when a gap happened to fall the right way.
+     * Only `on` being *added* counts, for two reasons.
+     *
+     * The scattered words carry an `<i>` pixel that blinks a `lit` class about
+     * ten times a second for as long as that scene is up, so counting every
+     * class change meant the skills scene never read as settled.
+     *
+     * And a scene leaving removes `on` from everything it owns. Counting those
+     * armed the clock on the way out, and since every `hide` strips its own
+     * scene class — leaving `body="ready s2"`, which reads as scene one — the
+     * label flashed "Skills" partway through every single transition.
      */
     const quiet = new MutationObserver((records) => {
       for (const m of records) {
         const was = /\bon\b/.test(m.oldValue ?? '');
-        if (was !== (m.target as Element).classList.contains('on')) return arm();
+        if (!was && (m.target as Element).classList.contains('on')) return arm();
       }
     });
 
